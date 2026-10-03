@@ -8,16 +8,43 @@ agendamento de tarefas, contra a API do Jaylog.
 
 ## Instalação
 
+Requer Node.js 18+. Não precisa instalar nada: o `npx` baixa e executa o pacote.
+
 ```bash
-bun install
-cp .env.example .env
-# edite .env com a URL da API (e, se for diferente, a do app web)
-bun run login
+export JAYLOG_API_BASE_URL=https://sua-api-jaylog   # URL da API
+npx -y jaylog-mcp-server login                       # abre o navegador para autenticar
 ```
+
+Depois do login, registre o servidor no seu cliente MCP.
+
+**Claude Code:**
+
+```bash
+claude mcp add jaylog --env JAYLOG_API_BASE_URL=https://sua-api-jaylog -- npx -y jaylog-mcp-server
+```
+
+**Outros clientes (Claude Desktop, Cursor etc.):**
+
+```json
+{
+  "mcpServers": {
+    "jaylog": {
+      "command": "npx",
+      "args": ["-y", "jaylog-mcp-server"],
+      "env": {
+        "JAYLOG_API_BASE_URL": "https://sua-api-jaylog"
+      }
+    }
+  }
+}
+```
+
+> Rodando via `npx`/Node, o arquivo `.env` **não** é lido. Defina as variáveis no shell ou no
+> bloco `env` do cliente MCP, como acima.
 
 ## Autenticação
 
-`bun run login` abre o navegador numa tela de consentimento do app web do Jaylog
+`npx -y jaylog-mcp-server login` abre o navegador numa tela de consentimento do app web do Jaylog
 (`/mcp/authorize`) — o mesmo padrão do `claude login`/`gh auth login`: o MCP sobe um servidor HTTP
 local efêmero (`127.0.0.1:<porta>`), o navegador confirma sua identidade (sessão já logada ou
 login + 2FA) e, ao clicar em "Permitir", o Jaylog emite um token pessoal que volta pro MCP via esse
@@ -27,11 +54,11 @@ callback local.
 - Expira em 15 dias, renovado automaticamente a cada uso — não expira por ficar o MCP parado, só por
   ficar **sem uso**.
 - Pode ser revogado a qualquer momento na tela "Tokens MCP" do app, sem precisar reinstalar nada.
-- `bun run logout` apenas apaga a credencial local; para invalidar o token de fato, revogue-o no app.
+- `logout` apenas apaga a credencial local; para invalidar o token de fato, revogue-o no app.
 
 ```bash
-bun run login      # autentica (abre o navegador)
-bun run logout     # remove a credencial local
+npx -y jaylog-mcp-server login     # autentica (abre o navegador)
+npx -y jaylog-mcp-server logout    # remove a credencial local
 ```
 
 ## Configuração
@@ -42,12 +69,17 @@ bun run logout     # remove a credencial local
 | `JAYLOG_FRONTEND_URL` | URL do app web do Jaylog, usada só pelo `login` para abrir `/mcp/authorize`. Se omitida, cai para `JAYLOG_API_BASE_URL` (ok quando os dois estão atrás do mesmo domínio). |
 | `JAYLOG_API_TOKEN` | Override explícito: se definida, tem prioridade sobre a credencial salva pelo `login`. Útil para CI/scripting. Qualquer perfil (guest, standard, staff, admin) funciona — cada tool exige o perfil mínimo que a rota correspondente já exige na API. |
 
-## Rodando
+## Desenvolvimento
+
+Para rodar a partir do código-fonte (requer [Bun](https://bun.sh)):
 
 ```bash
-bun run start     # roda direto com Bun
-bun run dev        # com --watch
-bun run build      # compila para dist/ (uso via Node/bin)
+bun install
+cp .env.example .env   # edite com a URL da API
+bun run login          # autentica (abre o navegador)
+bun run start          # roda direto com Bun
+bun run dev            # com --watch
+bun run build          # compila para dist/ (uso via Node/bin)
 ```
 
 ## Tools
@@ -100,5 +132,5 @@ src/
 Como o MCP roda via stdio, use o [MCP Inspector](https://github.com/modelcontextprotocol/inspector):
 
 ```bash
-npx @modelcontextprotocol/inspector bun src/index.ts
+npx @modelcontextprotocol/inspector npx -y jaylog-mcp-server
 ```

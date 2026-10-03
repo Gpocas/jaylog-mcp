@@ -1,18 +1,21 @@
 {
   "name": "jaylog-mcp",
   "version": "0.1.0",
-  "private": true,
   "description": "Model Context Protocol server for Jaylog observability (logs, metrics, services, schedules)",
   "bin": {
     "jaylog-mcp-server": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "bun src/index.ts",
     "dev": "bun --watch src/index.ts",
     "login": "bun src/index.ts login",
     "logout": "bun src/index.ts logout",
     "build": "tsc && chmod +x dist/*.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "jaylog",
@@ -21,7 +24,7 @@
     "claude"
   ],
   "author": "gpocas",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "zod": "^4.5.4"
