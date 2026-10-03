@@ -18,7 +18,7 @@
     "observability",
     "claude"
   ],
-  "author": "JBS - Novos Negócios / Tecnologia e Inovação",
+  "author": "gpocas",
   "license": "UNLICENSED",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
