@@ -2,7 +2,7 @@
 
 Servidor [Model Context Protocol](https://github.com/modelcontextprotocol) para observabilidade do
 ecossistema Jaylog: consulta de logs, métricas de recursos, erros, usuários chave, serviços e
-agendamento de tarefas, contra a API do [`backend-nn-analytics`](../../jbs/backend-nn-analytics).
+agendamento de tarefas, contra a API do Jaylog.
 
 > **Escopo inicial:** apenas ferramentas de leitura (GET). Nenhuma tool cria, altera ou apaga dados.
 
@@ -11,17 +11,17 @@ agendamento de tarefas, contra a API do [`backend-nn-analytics`](../../jbs/backe
 ```bash
 bun install
 cp .env.example .env
-# edite .env com a URL da API (e, se for diferente, a do frontend)
+# edite .env com a URL da API (e, se for diferente, a do app web)
 bun run login
 ```
 
 ## Autenticação
 
-`bun run login` abre o navegador numa tela de consentimento do
-[`frontend-analytics-logging`](../../jbs/frontend-analytics-logging) (`/mcp/authorize`) — o mesmo
-padrão do `claude login`/`gh auth login`: o MCP sobe um servidor HTTP local efêmero
-(`127.0.0.1:<porta>`), o navegador confirma sua identidade (sessão já logada ou login + 2FA) e, ao
-clicar em "Permitir", o backend emite um token pessoal que volta pro MCP via esse callback local.
+`bun run login` abre o navegador numa tela de consentimento do app web do Jaylog
+(`/mcp/authorize`) — o mesmo padrão do `claude login`/`gh auth login`: o MCP sobe um servidor HTTP
+local efêmero (`127.0.0.1:<porta>`), o navegador confirma sua identidade (sessão já logada ou
+login + 2FA) e, ao clicar em "Permitir", o Jaylog emite um token pessoal que volta pro MCP via esse
+callback local.
 
 - O token é salvo em `~/.config/jaylog-mcp/credentials.json` (permissão `600`).
 - Expira em 15 dias, renovado automaticamente a cada uso — não expira por ficar o MCP parado, só por
@@ -38,9 +38,9 @@ bun run logout     # remove a credencial local
 
 | Variável | Descrição |
 |---|---|
-| `JAYLOG_API_BASE_URL` | URL base da API do `backend-nn-analytics` (ex: `http://localhost:3000`) |
-| `JAYLOG_FRONTEND_URL` | URL do `frontend-analytics-logging`, usada só pelo `login` para abrir `/mcp/authorize`. Se omitida, cai para `JAYLOG_API_BASE_URL` (ok quando os dois estão atrás do mesmo domínio). |
-| `JAYLOG_API_TOKEN` | Override explícito: se definida, tem prioridade sobre a credencial salva pelo `login`. Útil para CI/scripting. Qualquer perfil (guest, standard, staff, admin) funciona — cada tool exige o perfil mínimo que a rota correspondente já exige no backend. |
+| `JAYLOG_API_BASE_URL` | URL base da API do Jaylog (ex: `http://localhost:3000`) |
+| `JAYLOG_FRONTEND_URL` | URL do app web do Jaylog, usada só pelo `login` para abrir `/mcp/authorize`. Se omitida, cai para `JAYLOG_API_BASE_URL` (ok quando os dois estão atrás do mesmo domínio). |
+| `JAYLOG_API_TOKEN` | Override explícito: se definida, tem prioridade sobre a credencial salva pelo `login`. Útil para CI/scripting. Qualquer perfil (guest, standard, staff, admin) funciona — cada tool exige o perfil mínimo que a rota correspondente já exige na API. |
 
 ## Rodando
 
@@ -86,7 +86,7 @@ bun run build      # compila para dist/ (uso via Node/bin)
 ```
 src/
 ├── index.ts        → bootstrap do McpServer (stdio)
-├── api.ts          → fetch autenticado contra o backend-nn-analytics
+├── api.ts          → fetch autenticado contra a API do Jaylog
 └── tools/
     ├── logs.ts      → logs, métricas, recursos, hosts
     ├── services.ts  → serviços
