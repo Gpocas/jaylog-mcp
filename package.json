@@ -1,0 +1,31 @@
+{
+  "name": "jaylog-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Model Context Protocol server for Jaylog observability (logs, metrics, services, schedules)",
+  "bin": {
+    "jaylog-mcp-server": "dist/index.js"
+  },
+  "scripts": {
+    "start": "bun src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "build": "tsc && chmod +x dist/*.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "jaylog",
+    "mcp",
+    "observability",
+    "claude"
+  ],
+  "author": "JBS - Novos Negócios / Tecnologia e Inovação",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
