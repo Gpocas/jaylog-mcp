@@ -12,10 +12,14 @@ import { registerLogTools } from './tools/logs'
 import { registerScheduleTools } from './tools/schedules'
 import { registerServiceTools } from './tools/services'
 
+// `require` (not `import`) keeps package.json out of tsc's rootDir; the path resolves
+// the same from src/ (bun) and dist/ (published), so the reported version can't drift.
+const { version } = require('../package.json') as { version: string }
+
 async function runServer() {
   const server = new McpServer({
     name: 'Jaylog',
-    version: '0.1.0'
+    version
   })
 
   registerLogTools(server)
