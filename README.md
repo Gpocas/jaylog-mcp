@@ -113,9 +113,30 @@ bun run build          # compila para dist/ (uso via Node/bin)
 - **`list-issues`**: issues (bugs/erros) abertos manualmente contra um serviço, com autor e responsável resolvidos.
 - **`get-issue`**: uma issue específica por ID.
 
+## Skills
+
+O repositório inclui skills (pasta `skills/`) com fluxos prontos que usam as tools acima. Elas
+seguem o padrão do [skills.sh](https://skills.sh) e funcionam em Claude Code, Cursor e outros
+agentes compatíveis. Requerem o MCP configurado e autenticado.
+
+```bash
+npx skills add Gpocas/jaylog-mcp                                   # instala todas
+npx skills add Gpocas/jaylog-mcp --skill jaylog-incident-report    # instala uma
+npx skills add Gpocas/jaylog-mcp -g                                # global (~/.claude/skills)
+```
+
+- **`jaylog-incident-report`**: relatório em markdown dos incidentes do dia anterior (erros nos
+  logs, serviços parados, agendamentos não cumpridos e issues), salvo em
+  `./reports/incidentes-AAAA-MM-DD.md`.
+- **`jaylog-fix-service-errors`**: levanta os erros recentes de um serviço, localiza o código
+  responsável na pasta atual e **propõe** correções (não edita arquivos).
+
 ## Estrutura
 
 ```
+skills/
+├── jaylog-incident-report/SKILL.md
+└── jaylog-fix-service-errors/SKILL.md
 src/
 ├── index.ts        → bootstrap do McpServer (stdio)
 ├── api.ts          → fetch autenticado contra a API do Jaylog
