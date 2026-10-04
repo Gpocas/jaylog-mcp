@@ -7,7 +7,7 @@ description: Gera o relatório de incidentes do dia anterior (ou de outra data) 
 
 Produz um relatório em markdown do que deu errado no dia anterior, usando as tools do MCP `jaylog` (somente leitura). O leitor típico abre o relatório de manhã para decidir o que atacar primeiro, então ele precisa dizer rápido **quem está quebrado, desde quando e quem acionar**, e deixar o detalhe para quem quiser se aprofundar.
 
-Se as tools do Jaylog (`list-logs`, `get-latest-logs` etc.) não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y jaylog-mcp-server login`) e pare. Não invente dados.
+Se as tools do Jaylog (`list-logs`, `get-latest-logs` etc.) não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y jaylog-mcp login`) e pare. Não invente dados.
 
 ## 1. Definir a janela
 

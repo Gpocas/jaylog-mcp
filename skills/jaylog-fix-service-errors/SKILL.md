@@ -7,7 +7,7 @@ description: Identifica os erros recentes de um serviço específico no Jaylog, 
 
 Parte dos logs reais de um serviço, acha onde no código da pasta atual cada erro nasce e **propõe** a correção. A skill não edita arquivos: o valor está em um diagnóstico fundamentado em evidência (logs + código) que a pessoa revisa antes de aplicar. Só aplique mudanças se o usuário pedir explicitamente depois de ver as propostas.
 
-Se as tools do Jaylog não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y jaylog-mcp-server login`) e pare.
+Se as tools do Jaylog não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y jaylog-mcp login`) e pare.
 
 ## 1. Identificar o serviço
 

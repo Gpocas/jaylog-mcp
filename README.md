@@ -6,13 +6,29 @@ agendamento de tarefas, contra a API do Jaylog.
 
 > **Escopo inicial:** apenas ferramentas de leitura (GET). Nenhuma tool cria, altera ou apaga dados.
 
+## Sumário
+
+- [Instalação](#instalação)
+- [Autenticação](#autenticação)
+- [Configuração](#configuração)
+- [Desenvolvimento](#desenvolvimento)
+- [Tools](#tools)
+  - [Logs, métricas e recursos](#logs-métricas-e-recursos)
+  - [Serviços](#serviços)
+  - [Agendamento de tarefas](#agendamento-de-tarefas)
+  - [Usuários chave](#usuários-chave)
+  - [Erros / Issues](#erros--issues)
+- [Skills](#skills)
+- [Estrutura](#estrutura)
+- [Debugging](#debugging)
+
 ## Instalação
 
 Requer Node.js 18+. Não precisa instalar nada: o `npx` baixa e executa o pacote.
 
 ```bash
 export JAYLOG_API_BASE_URL=https://sua-api-jaylog   # URL da API
-npx -y jaylog-mcp-server login                       # abre o navegador para autenticar
+npx -y jaylog-mcp login                       # abre o navegador para autenticar
 ```
 
 Depois do login, registre o servidor no seu cliente MCP.
@@ -20,7 +36,7 @@ Depois do login, registre o servidor no seu cliente MCP.
 **Claude Code:**
 
 ```bash
-claude mcp add jaylog --env JAYLOG_API_BASE_URL=https://sua-api-jaylog -- npx -y jaylog-mcp-server
+claude mcp add jaylog --env JAYLOG_API_BASE_URL=https://sua-api-jaylog -- npx -y jaylog-mcp
 ```
 
 **Outros clientes (Claude Desktop, Cursor etc.):**
@@ -30,7 +46,7 @@ claude mcp add jaylog --env JAYLOG_API_BASE_URL=https://sua-api-jaylog -- npx -y
   "mcpServers": {
     "jaylog": {
       "command": "npx",
-      "args": ["-y", "jaylog-mcp-server"],
+      "args": ["-y", "jaylog-mcp"],
       "env": {
         "JAYLOG_API_BASE_URL": "https://sua-api-jaylog"
       }
@@ -44,7 +60,7 @@ claude mcp add jaylog --env JAYLOG_API_BASE_URL=https://sua-api-jaylog -- npx -y
 
 ## Autenticação
 
-`npx -y jaylog-mcp-server login` abre o navegador numa tela de consentimento do app web do Jaylog
+`npx -y jaylog-mcp login` abre o navegador numa tela de consentimento do app web do Jaylog
 (`/mcp/authorize`) — o mesmo padrão do `claude login`/`gh auth login`: o MCP sobe um servidor HTTP
 local efêmero (`127.0.0.1:<porta>`), o navegador confirma sua identidade (sessão já logada ou
 login + 2FA) e, ao clicar em "Permitir", o Jaylog emite um token pessoal que volta pro MCP via esse
@@ -57,8 +73,8 @@ callback local.
 - `logout` apenas apaga a credencial local; para invalidar o token de fato, revogue-o no app.
 
 ```bash
-npx -y jaylog-mcp-server login     # autentica (abre o navegador)
-npx -y jaylog-mcp-server logout    # remove a credencial local
+npx -y jaylog-mcp login     # autentica (abre o navegador)
+npx -y jaylog-mcp logout    # remove a credencial local
 ```
 
 ## Configuração
@@ -153,5 +169,5 @@ src/
 Como o MCP roda via stdio, use o [MCP Inspector](https://github.com/modelcontextprotocol/inspector):
 
 ```bash
-npx @modelcontextprotocol/inspector npx -y jaylog-mcp-server
+npx @modelcontextprotocol/inspector npx -y jaylog-mcp
 ```
