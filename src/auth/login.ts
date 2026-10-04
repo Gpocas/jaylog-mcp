@@ -31,9 +31,10 @@ p { color: #a1a1aa; font-size: 0.9rem; }
  * freshly minted personal token back to a one-shot local server, store it.
  */
 export async function login(): Promise<void> {
-  const frontendUrl = process.env.JAYLOG_FRONTEND_URL || process.env.JAYLOG_API_BASE_URL
+  const frontendUrl =
+    process.env.JAYLOG_FRONTEND_URL || process.env.JAYLOG_URL || process.env.JAYLOG_API_BASE_URL
   if (!frontendUrl) {
-    throw new Error('Set JAYLOG_FRONTEND_URL (or JAYLOG_API_BASE_URL) before running login.')
+    throw new Error('Set JAYLOG_URL (the Jaylog web app URL) before running login.')
   }
 
   const state = randomBytes(16).toString('hex')

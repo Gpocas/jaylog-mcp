@@ -1,7 +1,22 @@
 import { readCredentials } from './credentials'
 
-const config = {
-  baseUrl: process.env.JAYLOG_API_BASE_URL
+const trimSlashes = (value: string) => value.replace(/\/+$/, '')
+
+/**
+ * Where API calls go. `JAYLOG_API_BASE_URL` wins when set (local dev, where the
+ * backend and the web app run on different ports, or a deployment that exposes
+ * the API directly). Otherwise the single `JAYLOG_URL` is the web app's address
+ * and the API is reached through its `/proxy/*` route, which forwards to the
+ * backend — that is what lets users configure one URL instead of two.
+ */
+export function resolveApiBaseUrl(): string | undefined {
+  const apiBase = process.env.JAYLOG_API_BASE_URL
+  if (apiBase) return trimSlashes(apiBase)
+
+  const appUrl = process.env.JAYLOG_URL
+  if (appUrl) return `${trimSlashes(appUrl)}/proxy`
+
+  return undefined
 }
 
 /**
@@ -21,12 +36,15 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 }
 
 export function buildUrl(path: string, qs: Record<string, any> = {}): string {
-  if (!config.baseUrl) {
+  const baseUrl = resolveApiBaseUrl()
+  if (!baseUrl) {
     throw new Error(
-      'JAYLOG_API_BASE_URL is not set. Configure it (and JAYLOG_API_TOKEN) in the environment.'
+      'JAYLOG_URL is not set. Set it to the Jaylog web app URL (or JAYLOG_API_BASE_URL to call the API directly).'
     )
   }
-  const url = new URL(path, config.baseUrl)
+  // `new URL('/x', 'https://host/proxy')` drops `/proxy`, so keep the base's
+  // path by resolving a relative path against a base that ends in `/`.
+  const url = new URL(path.replace(/^\/+/, ''), `${baseUrl}/`)
   for (const [k, v] of Object.entries(qs)) {
     if (v !== undefined && v !== null) url.searchParams.set(k, String(v))
   }

@@ -27,16 +27,19 @@ agendamento de tarefas, contra a API do Jaylog.
 Requer Node.js 18+. Não precisa instalar nada: o `npx` baixa e executa o pacote.
 
 ```bash
-export JAYLOG_API_BASE_URL=https://sua-api-jaylog   # URL da API
-npx -y jaylog-mcp login                       # abre o navegador para autenticar
+export JAYLOG_URL=https://seu-app-jaylog   # URL do app web do Jaylog
+npx -y jaylog-mcp login                     # abre o navegador para autenticar
 ```
+
+> Uma única URL basta: o MCP chama a API pelo proxy do app web (`<JAYLOG_URL>/proxy/*`). Para
+> apontar a API diretamente (ex.: desenvolvimento local), veja [Configuração](#configuração).
 
 Depois do login, registre o servidor no seu cliente MCP.
 
 **Claude Code:**
 
 ```bash
-claude mcp add jaylog --env JAYLOG_API_BASE_URL=https://sua-api-jaylog -- npx -y jaylog-mcp
+claude mcp add jaylog --env JAYLOG_URL=https://seu-app-jaylog -- npx -y jaylog-mcp
 ```
 
 **Outros clientes (Claude Desktop, Cursor etc.):**
@@ -48,7 +51,7 @@ claude mcp add jaylog --env JAYLOG_API_BASE_URL=https://sua-api-jaylog -- npx -y
       "command": "npx",
       "args": ["-y", "jaylog-mcp"],
       "env": {
-        "JAYLOG_API_BASE_URL": "https://sua-api-jaylog"
+        "JAYLOG_URL": "https://seu-app-jaylog"
       }
     }
   }
@@ -81,8 +84,9 @@ npx -y jaylog-mcp logout    # remove a credencial local
 
 | Variável | Descrição |
 |---|---|
-| `JAYLOG_API_BASE_URL` | URL base da API do Jaylog (ex: `http://localhost:3000`) |
-| `JAYLOG_FRONTEND_URL` | URL do app web do Jaylog, usada só pelo `login` para abrir `/mcp/authorize`. Se omitida, cai para `JAYLOG_API_BASE_URL` (ok quando os dois estão atrás do mesmo domínio). |
+| `JAYLOG_URL` | URL do app web do Jaylog. É a única variável necessária: o `login` abre `<JAYLOG_URL>/mcp/authorize` e as tools chamam a API em `<JAYLOG_URL>/proxy/*`. |
+| `JAYLOG_API_BASE_URL` | Override opcional: URL base da API chamada diretamente, sem passar pelo proxy (ex: `http://localhost:3000`). Quando definida, tem prioridade sobre `JAYLOG_URL` nas chamadas à API. |
+| `JAYLOG_FRONTEND_URL` | Override opcional: URL do app web usada só pelo `login`. Útil em desenvolvimento local, onde a API e o app web rodam em portas diferentes. Se omitida, cai para `JAYLOG_URL`. |
 | `JAYLOG_API_TOKEN` | Override explícito: se definida, tem prioridade sobre a credencial salva pelo `login`. Útil para CI/scripting. Qualquer perfil (guest, standard, staff, admin) funciona — cada tool exige o perfil mínimo que a rota correspondente já exige na API. |
 
 ## Desenvolvimento
@@ -91,7 +95,7 @@ Para rodar a partir do código-fonte (requer [Bun](https://bun.sh)):
 
 ```bash
 bun install
-cp .env.example .env   # edite com a URL da API
+cp .env.example .env   # edite com as URLs do app web/API
 bun run login          # autentica (abre o navegador)
 bun run start          # roda direto com Bun
 bun run dev            # com --watch
@@ -113,7 +117,9 @@ bun run build          # compila para dist/ (uso via Node/bin)
 
 ### Serviços
 
-- **`list-services`**: lista serviços (aplicações/bots que enviam logs), com dono, empresa e setor resolvidos.
+- **`list-services`**: lista serviços (aplicações/bots que enviam logs), com empresa e setor resolvidos. O `owner` vem como ID de usuário.
+- **`list-favorite-services`**: serviços favoritados pelo usuário autenticado (os favoritos são sempre do usuário logado no MCP).
+- **`search-services-by-owner`**: busca serviços pelo nome e/ou e-mail do dono (substring, sem diferenciar maiúsculas), retornando um item por usuário encontrado com seus serviços. Requer perfil `standard` ou superior.
 
 ### Agendamento de tarefas
 
@@ -141,11 +147,14 @@ npx skills add Gpocas/jaylog-mcp --skill jaylog-incident-report    # instala uma
 npx skills add Gpocas/jaylog-mcp -g                                # global (~/.claude/skills)
 ```
 
-- **`jaylog-incident-report`**: relatório em markdown dos incidentes do dia anterior (erros nos
-  logs, serviços parados, agendamentos não cumpridos e issues), salvo em
+- **`jaylog-incident-report`**: relatório em markdown de incidentes (erros nos logs, serviços
+  parados, agendamentos não cumpridos e issues). Começa com uma entrevista de múltipla escolha
+  para personalizar escopo (todos, favoritos ou serviços de um owner), categorias, período
+  (padrão: dia anterior) e extras (contatos, mensagens completas, só críticos). Salva em
   `./reports/incidentes-AAAA-MM-DD.md`.
-- **`jaylog-fix-service-errors`**: levanta os erros recentes de um serviço, localiza o código
-  responsável na pasta atual e **propõe** correções (não edita arquivos).
+- **`jaylog-fix-service-errors`**: levanta os erros recentes de um serviço (escolhido por nome,
+  owner ou entre os favoritos), localiza o código responsável na pasta atual e **propõe**
+  correções (não edita arquivos).
 
 ## Estrutura
 

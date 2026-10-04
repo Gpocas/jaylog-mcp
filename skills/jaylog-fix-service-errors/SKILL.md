@@ -1,18 +1,20 @@
 ---
 name: jaylog-fix-service-errors
-description: Identifica os erros recentes de um serviço específico no Jaylog, localiza o código responsável na codebase atual e propõe correções (sem editar arquivos). Use sempre que o usuário pedir para investigar, diagnosticar ou corrigir erros de um serviço/bot/RPA pelo nome, disser que um serviço "está dando erro", "caindo" ou "quebrando", ou colar o nome de um serviço pedindo para olhar os logs e resolver no código, mesmo sem citar "Jaylog".
+description: Identifica os erros recentes de um serviço específico no Jaylog, localiza o código responsável na codebase atual e propõe correções (sem editar arquivos). Use sempre que o usuário pedir para investigar, diagnosticar ou corrigir erros de um serviço/bot/RPA pelo nome, pelo dono ou a partir dos favoritos, disser que um serviço "está dando erro", "caindo" ou "quebrando", ou colar o nome de um serviço pedindo para olhar os logs e resolver no código, mesmo sem citar "Jaylog".
 ---
 
 # Corrigir erros de um serviço Jaylog
 
 Parte dos logs reais de um serviço, acha onde no código da pasta atual cada erro nasce e **propõe** a correção. A skill não edita arquivos: o valor está em um diagnóstico fundamentado em evidência (logs + código) que a pessoa revisa antes de aplicar. Só aplique mudanças se o usuário pedir explicitamente depois de ver as propostas.
 
-Se as tools do Jaylog não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y jaylog-mcp login`) e pare.
+Se as tools do Jaylog não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y jaylog-mcp login`, com `JAYLOG_URL` definida) e pare.
 
 ## 1. Identificar o serviço
 
-- Pegue o nome informado pelo usuário e rode `list-services` com `name`. Se não vier nome, pergunte; não adivinhe a partir do nome da pasta, a menos que ele seja o único candidato óbvio e você confirme.
-- Mais de um resultado: mostre as opções (nome, empresa, setor) e pergunte qual. Nenhum: tente variações do nome e, se continuar vazio, diga que não achou.
+- **Nome informado:** rode `list-services` com `name` (substring).
+- **Dono informado** ("os serviços do fulano", "o bot da Maria"): use `search-services-by-owner` com `name` ou `email` e trabalhe com os serviços da pessoa encontrada.
+- **Nada informado:** não adivinhe a partir do nome da pasta, a menos que ele seja o único candidato óbvio e você confirme. Ofereça os favoritos do usuário (`list-favorite-services`) como atalho, numa pergunta de múltipla escolha (`AskUserQuestion`, se disponível), com "Outro" para digitar o nome. Sem favoritos, pergunte o nome.
+- Mais de um resultado: mostre as opções (nome, empresa, setor) e pergunte qual, também em múltipla escolha quando couber. Nenhum: tente variações do nome e, se continuar vazio, diga que não achou.
 - Guarde o `id` do serviço; as demais tools o exigem.
 
 ## 2. Levantar os erros
