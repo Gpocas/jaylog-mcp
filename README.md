@@ -24,7 +24,7 @@ agendamento de tarefas, contra a API do Jaylog.
 
 ## Instalação
 
-Requer Node.js 18+. Não precisa instalar nada: o `npx` baixa e executa o pacote.
+Requer Node.js 20.18+. Não precisa instalar nada: o `npx` baixa e executa o pacote.
 
 ```bash
 export JAYLOG_URL=https://seu-app-jaylog   # URL do app web do Jaylog
@@ -88,6 +88,48 @@ npx -y jaylog-mcp logout    # remove a credencial local
 | `JAYLOG_API_BASE_URL` | Override opcional: URL base da API chamada diretamente, sem passar pelo proxy (ex: `http://localhost:3000`). Quando definida, tem prioridade sobre `JAYLOG_URL` nas chamadas à API. |
 | `JAYLOG_FRONTEND_URL` | Override opcional: URL do app web usada só pelo `login`. Útil em desenvolvimento local, onde a API e o app web rodam em portas diferentes. Se omitida, cai para `JAYLOG_URL`. |
 | `JAYLOG_API_TOKEN` | Override explícito: se definida, tem prioridade sobre a credencial salva pelo `login`. Útil para CI/scripting. Qualquer perfil (guest, standard, staff, admin) funciona — cada tool exige o perfil mínimo que a rota correspondente já exige na API. |
+| `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` | Opcionais: proxy corporativo usado nas chamadas à API (ex: `http://proxy.empresa:8080`). Aceitos em maiúsculas ou minúsculas; `NO_PROXY` lista hosts que devem ignorar o proxy. |
+
+### Proxy corporativo
+
+Se a sua rede exige proxy para acessar o Jaylog, defina `HTTPS_PROXY` (e `NO_PROXY`, se precisar)
+no bloco `env` do cliente MCP, junto com o `JAYLOG_URL`:
+
+**Claude Code:**
+
+```bash
+claude mcp add jaylog \
+  --env JAYLOG_URL=https://seu-app-jaylog \
+  --env HTTPS_PROXY=http://proxy.empresa:8080 \
+  --env NO_PROXY=localhost,127.0.0.1 \
+  -- npx -y jaylog-mcp
+```
+
+**Outros clientes (Claude Desktop, Cursor etc.):**
+
+```json
+{
+  "mcpServers": {
+    "jaylog": {
+      "command": "npx",
+      "args": ["-y", "jaylog-mcp"],
+      "env": {
+        "JAYLOG_URL": "https://seu-app-jaylog",
+        "HTTPS_PROXY": "http://proxy.empresa:8080",
+        "NO_PROXY": "localhost,127.0.0.1"
+      }
+    }
+  }
+}
+```
+
+- Como o `JAYLOG_URL` normalmente é `https://`, vale o `HTTPS_PROXY`. O `HTTP_PROXY` só é usado
+  quando a URL é `http://`.
+- Se o proxy exigir autenticação, informe as credenciais na URL: `http://usuario:senha@proxy.empresa:8080`.
+- Se o Jaylog for interno e não deve passar pelo proxy, inclua o domínio dele no `NO_PROXY`.
+- As variáveis também podem ser exportadas no shell (`export HTTPS_PROXY=...`) ao rodar o
+  servidor manualmente. Nomes em minúsculas (`https_proxy`) também funcionam.
+- Sem nenhuma dessas variáveis, as requisições saem direto, como antes.
 
 ## Desenvolvimento
 

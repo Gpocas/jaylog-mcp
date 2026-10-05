@@ -51,6 +51,27 @@ export function buildUrl(path: string, qs: Record<string, any> = {}): string {
   return url.toString()
 }
 
+const hasProxyEnv = () =>
+  ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy'].some((name) => process.env[name])
+
+let proxyFetch: Promise<typeof fetch> | undefined
+
+/**
+ * Bun's `fetch` already honours `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY`, but
+ * Node's does not (the published bin runs on Node). So on Node, when a proxy is
+ * configured, route through undici's `EnvHttpProxyAgent`, which reads the same
+ * variables. Without a proxy configured, plain `fetch` is used untouched.
+ */
+async function proxyAwareFetch(url: string, init: RequestInit): Promise<Response> {
+  if (process.versions.bun || !hasProxyEnv()) return fetch(url, init)
+
+  proxyFetch ??= import('undici').then(({ fetch: undiciFetch, EnvHttpProxyAgent }) => {
+    const dispatcher = new EnvHttpProxyAgent()
+    return ((input, init) => undiciFetch(input as any, { ...(init as any), dispatcher })) as typeof fetch
+  })
+  return (await proxyFetch)(url, init)
+}
+
 export async function fetchJSON<T = any>(path: string, qs: Record<string, any> = {}): Promise<T> {
   const url = buildUrl(path, qs)
   const headers = await getAuthHeaders()
@@ -59,7 +80,7 @@ export async function fetchJSON<T = any>(path: string, qs: Record<string, any> =
       'Not authenticated. Run `bun run login` (or set JAYLOG_API_TOKEN) before using jaylog-mcp.'
     )
   }
-  const resp = await fetch(url, { headers })
+  const resp = await proxyAwareFetch(url, { headers })
   if (!resp.ok) {
     const body = await resp.text().catch(() => '')
     throw new Error(`Jaylog API error [${resp.status}] ${resp.statusText}${body ? `: ${body}` : ''}`)
