@@ -259,6 +259,43 @@ npx skills add Gpocas/jaylog-mcp --skill jaylog-incident-report    # instala uma
 npx skills add Gpocas/jaylog-mcp -g                                # global (~/.claude/skills)
 ```
 
+### Atualizando as skills
+
+As skills instaladas são **cópias** dos arquivos do repositório. Elas não se atualizam sozinhas
+quando o repositório muda. O CLI do skills.sh registra de onde cada skill veio num arquivo de
+controle (lock): `~/.agents/.skill-lock.json` para as globais e `skills-lock.json` na raiz do
+projeto para as de projeto. É por esse registro que ele sabe o que atualizar.
+
+```bash
+npx skills check        # lista as skills com versão mais nova no repositório (não instala nada)
+npx skills update       # atualiza as instaladas (pergunta o escopo: global ou projeto)
+npx skills update -g    # só as globais
+npx skills update -p    # só as do projeto
+```
+
+Depois de atualizar, **abra uma nova sessão** do Claude Code (ou do seu agente). As skills são
+carregadas no início da sessão.
+
+**Skills novas no repositório** (ex.: `jaylog-open-issue`) não são instaladas pelo `update`, que só
+atualiza o que você já tem. Instale com `add`:
+
+```bash
+npx skills add Gpocas/jaylog-mcp --skill jaylog-open-issue -g
+```
+
+**Skills legadas** (instaladas com uma versão antiga do CLI, ou copiadas manualmente para
+`~/.claude/skills`) podem não estar no arquivo de controle. Quando ele está num formato antigo, o
+CLI o descarta, e essas skills deixam de ser acompanhadas. O `check`/`update` então as ignora ou
+avisa que *não podem ser verificadas automaticamente*. Reinstale com `add`, que sobrescreve os
+arquivos e volta a registrar a origem. A partir daí, o `update` funciona normalmente:
+
+```bash
+npx skills add Gpocas/jaylog-mcp -g -y    # globais; sem -g para as de projeto
+```
+
+Vale reinstalar também se as suas skills ainda mandam rodar `npx -y jaylog-mcp login`. É a
+instalação antiga via npmjs, que não é mais usada.
+
 - **`jaylog-incident-report`**: relatório em markdown de incidentes (erros nos logs, serviços
   parados, agendamentos não cumpridos e issues). Começa com uma entrevista de múltipla escolha
   para personalizar escopo (todos, favoritos ou serviços de um owner), categorias, período
