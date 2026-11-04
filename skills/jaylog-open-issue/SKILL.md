@@ -1,6 +1,6 @@
 ---
 name: jaylog-open-issue
-description: Decide se um bug de um serviço Jaylog merece uma issue e, se merecer, abre a issue com a tool `create-issue`. Antes de abrir, confere se o erro já foi corrigido numa versão mais nova, se já existe issue igual, qual a causa, como pode voltar e qual o Exemplo Mínimo Reproduzível (EMR). Também orienta a resolução: planejar a correção, medir o impacto e testar com o EMR. Use sempre que o usuário quiser abrir, registrar, reportar ou criar uma issue, bug, chamado ou ticket contra um serviço, bot ou RPA, mesmo sem citar "Jaylog". Use também quando ele perguntar se vale abrir uma issue para um erro, ou quiser transformar um erro dos logs em issue.
+description: Decide se um bug de um serviço Jaylog merece uma issue e, se merecer, abre a issue com a tool `create-issue`. Antes de abrir, confere se o erro já foi corrigido numa versão mais nova, se já existe issue igual, qual a causa, como pode voltar e qual o Exemplo Mínimo Reproduzível (EMR). Também orienta a resolução (planejar a correção, medir o impacto e testar com o EMR). Use sempre que o usuário quiser abrir, registrar, reportar ou criar uma issue, bug, chamado ou ticket contra um serviço, bot ou RPA, mesmo sem citar "Jaylog". Use também quando ele perguntar se vale abrir uma issue para um erro, ou quiser transformar um erro dos logs em issue.
 ---
 
 # Abrir uma issue no Jaylog
