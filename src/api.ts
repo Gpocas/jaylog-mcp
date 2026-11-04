@@ -94,10 +94,18 @@ export async function fetchJSON<T = any>(path: string, qs: Record<string, any> =
   return requestJSON<T>(buildUrl(path, qs))
 }
 
-export async function postJSON<T = any>(path: string, body: unknown): Promise<T> {
+function sendJSON<T>(method: 'POST' | 'PATCH', path: string, body: unknown): Promise<T> {
   return requestJSON<T>(buildUrl(path), {
-    method: 'POST',
+    method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   })
+}
+
+export async function postJSON<T = any>(path: string, body: unknown): Promise<T> {
+  return sendJSON<T>('POST', path, body)
+}
+
+export async function patchJSON<T = any>(path: string, body: unknown): Promise<T> {
+  return sendJSON<T>('PATCH', path, body)
 }

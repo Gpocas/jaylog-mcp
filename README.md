@@ -4,8 +4,8 @@ Servidor [Model Context Protocol](https://github.com/modelcontextprotocol) para 
 ecossistema Jaylog: consulta de logs, métricas de recursos, erros, usuários chave, serviços e
 agendamento de tarefas, contra a API do Jaylog.
 
-> **Escopo:** ferramentas de leitura (GET), mais a criação de issues (`create-issue`). Nenhuma tool
-> altera ou apaga dados.
+> **Escopo:** ferramentas de leitura (GET), mais criação e edição de issues (`create-issue` e
+> `update-issue`). Nenhuma tool apaga dados.
 
 ## Sumário
 
@@ -239,6 +239,13 @@ bun run build          # compila para dist/ (uso via Node/bin)
   Parâmetros: `title` (10–100 caracteres), `description` (opcional, até 3000), `service` (UUID) e
   `assignee` (opcional, UUID — padrão: dono do serviço). O responsável é notificado por e-mail.
   Exige perfil `standard` ou superior.
+- **`update-issue`**: edita uma issue existente. Só os campos enviados mudam: `title`,
+  `description`, `state` (`open`, `working`, `merged`, `closed`), `commit`, `solution` e
+  `assignee`. Regras aplicadas pela API:
+  - issues `merged` ou `closed` ficam travadas e não podem mais ser editadas;
+  - só o autor altera `title` e `description`;
+  - `commit` e `solution` só podem ser enviados junto com `state: "merged"`, pelo responsável;
+  - mover para `merged` ou `closed` registra a data de fechamento e notifica o autor por e-mail.
 
 ## Skills
 
@@ -260,13 +267,19 @@ npx skills add Gpocas/jaylog-mcp -g                                # global (~/.
 - **`jaylog-fix-service-errors`**: levanta os erros recentes de um serviço (escolhido por nome,
   owner ou entre os favoritos), localiza o código responsável na pasta atual e **propõe**
   correções (não edita arquivos).
+- **`jaylog-open-issue`**: decide se um bug merece issue (já corrigido numa versão mais nova?
+  já existe issue igual? é regressão?) e, se merecer, monta a issue com versão/ambiente, causa,
+  condições de recorrência e um Exemplo Mínimo Reproduzível (EMR). Mostra uma prévia e só chama
+  `create-issue` após aprovação. Também orienta a resolução: planejar, avaliar impacto e testar
+  com o EMR.
 
 ## Estrutura
 
 ```
 skills/
 ├── jaylog-incident-report/SKILL.md
-└── jaylog-fix-service-errors/SKILL.md
+├── jaylog-fix-service-errors/SKILL.md
+└── jaylog-open-issue/SKILL.md
 src/
 ├── index.ts        → bootstrap do McpServer (stdio)
 ├── api.ts          → fetch autenticado contra a API do Jaylog
