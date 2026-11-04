@@ -72,18 +72,32 @@ async function proxyAwareFetch(url: string, init: RequestInit): Promise<Response
   return (await proxyFetch)(url, init)
 }
 
-export async function fetchJSON<T = any>(path: string, qs: Record<string, any> = {}): Promise<T> {
-  const url = buildUrl(path, qs)
+async function requestJSON<T>(url: string, init: RequestInit = {}): Promise<T> {
   const headers = await getAuthHeaders()
   if (!headers.Authorization) {
     throw new Error(
       'Not authenticated. Run `bun run login` (or set JAYLOG_API_TOKEN) before using jaylog-mcp.'
     )
   }
-  const resp = await proxyAwareFetch(url, { headers })
+  const resp = await proxyAwareFetch(url, {
+    ...init,
+    headers: { ...(init.headers as Record<string, string> | undefined), ...headers }
+  })
   if (!resp.ok) {
     const body = await resp.text().catch(() => '')
     throw new Error(`Jaylog API error [${resp.status}] ${resp.statusText}${body ? `: ${body}` : ''}`)
   }
   return (await resp.json()) as T
+}
+
+export async function fetchJSON<T = any>(path: string, qs: Record<string, any> = {}): Promise<T> {
+  return requestJSON<T>(buildUrl(path, qs))
+}
+
+export async function postJSON<T = any>(path: string, body: unknown): Promise<T> {
+  return requestJSON<T>(buildUrl(path), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
 }

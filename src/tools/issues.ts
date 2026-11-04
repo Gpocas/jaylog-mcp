@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 
-import { fetchJSON } from '../api'
+import { fetchJSON, postJSON } from '../api'
 
 const issueStates = ['open', 'working', 'merged', 'closed'] as const
 
@@ -43,5 +43,35 @@ export function registerIssueTools(server: McpServer) {
       }
     },
     async ({ id }) => asText(await fetchJSON(`/issues/${id}`))
+  )
+
+  server.registerTool(
+    'create-issue',
+    {
+      description:
+        'Open a new issue (bug/error) against a service, authored by the authenticated user. ' +
+        'If no assignee is given, the service owner is assigned. The assignee is notified by email. ' +
+        'This writes data—confirm title, description, service and assignee with the user before calling.',
+      inputSchema: {
+        title: z.string().min(10).max(100).describe('Short summary of the problem (10–100 characters)'),
+        description: z
+          .string()
+          .max(3000)
+          .optional()
+          .describe('Details: what happened, impact, evidence such as log IDs (up to 3000 characters)'),
+        service: z.string().uuid().describe('ID of the service the issue is opened against'),
+        assignee: z
+          .string()
+          .uuid()
+          .optional()
+          .describe('User ID to assign; defaults to the service owner')
+      },
+      annotations: {
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: false
+      }
+    },
+    async params => asText(await postJSON('/issues/add', params))
   )
 }

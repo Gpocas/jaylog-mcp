@@ -4,7 +4,8 @@ Servidor [Model Context Protocol](https://github.com/modelcontextprotocol) para 
 ecossistema Jaylog: consulta de logs, métricas de recursos, erros, usuários chave, serviços e
 agendamento de tarefas, contra a API do Jaylog.
 
-> **Escopo inicial:** apenas ferramentas de leitura (GET). Nenhuma tool cria, altera ou apaga dados.
+> **Escopo:** ferramentas de leitura (GET), mais a criação de issues (`create-issue`). Nenhuma tool
+> altera ou apaga dados.
 
 ## Sumário
 
@@ -176,6 +177,10 @@ bun run build          # compila para dist/ (uso via Node/bin)
 
 - **`list-issues`**: issues (bugs/erros) abertos manualmente contra um serviço, com autor e responsável resolvidos.
 - **`get-issue`**: uma issue específica por ID.
+- **`create-issue`**: abre uma issue contra um serviço, tendo como autor o usuário autenticado.
+  Parâmetros: `title` (10–100 caracteres), `description` (opcional, até 3000), `service` (UUID) e
+  `assignee` (opcional, UUID — padrão: dono do serviço). O responsável é notificado por e-mail.
+  Exige perfil `standard` ou superior.
 
 ## Skills
 
