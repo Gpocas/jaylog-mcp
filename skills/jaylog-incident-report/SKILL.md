@@ -7,7 +7,7 @@ description: Gera um relatório de incidentes do ecossistema Jaylog em markdown 
 
 Produz um relatório em markdown do que deu errado, usando as tools do MCP `jaylog` (somente leitura). O leitor típico abre o relatório de manhã para decidir o que atacar primeiro, então ele precisa dizer rápido **quem está quebrado, desde quando e quem acionar**, e deixar o detalhe para quem quiser se aprofundar. Como cada pessoa quer um recorte diferente (só os próprios serviços, só o que é crítico, sem contatos...), a skill começa com uma entrevista curta para montar o relatório sob medida.
 
-Se as tools do Jaylog (`list-logs`, `get-latest-logs` etc.) não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y jaylog-mcp login`, com `JAYLOG_URL` definida) e pare. Não invente dados.
+Se as tools do Jaylog (`list-logs`, `get-latest-logs` etc.) não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y github:Gpocas/jaylog-mcp login`, com `JAYLOG_URL` definida) e pare. Não invente dados.
 
 ## 1. Entrevista de personalização
 

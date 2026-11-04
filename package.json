@@ -1,6 +1,7 @@
 {
   "name": "jaylog-mcp",
-  "version": "0.1.5",
+  "version": "0.1.6",
+  "private": true,
   "description": "Model Context Protocol server for Jaylog observability (logs, metrics, services, schedules)",
   "bin": {
     "jaylog-mcp-server": "dist/index.js"
@@ -15,7 +16,7 @@
     "logout": "bun src/index.ts logout",
     "build": "tsc && chmod +x dist/*.js",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepare": "npm run build"
   },
   "keywords": [
     "jaylog",

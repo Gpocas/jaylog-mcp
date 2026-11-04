@@ -10,6 +10,7 @@ agendamento de tarefas, contra a API do Jaylog.
 ## Sumário
 
 - [Instalação](#instalação)
+  - [Atualizações](#atualizações)
 - [Autenticação](#autenticação)
 - [Configuração](#configuração)
 - [Desenvolvimento](#desenvolvimento)
@@ -25,11 +26,18 @@ agendamento de tarefas, contra a API do Jaylog.
 
 ## Instalação
 
-Requer Node.js 20.18+. Não precisa instalar nada: o `npx` baixa e executa o pacote.
+O pacote é instalado direto do repositório
+[Gpocas/jaylog-mcp](https://github.com/Gpocas/jaylog-mcp) pelo `npx`. Ele **não** é publicado no
+npmjs.
+
+Requisitos:
+
+- Node.js 20.18+.
+- **`git` instalado** e no `PATH`: o npm usa `git ls-remote`/`git clone` para buscar o repositório.
 
 ```bash
-export JAYLOG_URL=https://seu-app-jaylog   # URL do app web do Jaylog
-npx -y jaylog-mcp login                     # abre o navegador para autenticar
+export JAYLOG_URL=https://seu-app-jaylog       # URL do app web do Jaylog
+npx -y github:Gpocas/jaylog-mcp login           # abre o navegador para autenticar
 ```
 
 > Uma única URL basta: o MCP chama a API pelo proxy do app web (`<JAYLOG_URL>/proxy/*`). Para
@@ -40,8 +48,12 @@ Depois do login, registre o servidor no seu cliente MCP.
 **Claude Code:**
 
 ```bash
-claude mcp add jaylog --env JAYLOG_URL=https://seu-app-jaylog -- npx -y jaylog-mcp
+claude mcp add jaylog --scope user --env JAYLOG_URL=https://seu-app-jaylog -- npx -y github:Gpocas/jaylog-mcp
 ```
+
+> `--scope user` registra o servidor para o seu usuário, em todos os projetos. Sem a flag, o padrão
+> é `local`: o servidor só aparece no diretório onde o comando foi executado. Há ainda o escopo
+> `project`, que grava em `.mcp.json` na raiz do repositório e vale para todos que o usam.
 
 **Outros clientes (Claude Desktop, Cursor etc.):**
 
@@ -50,7 +62,7 @@ claude mcp add jaylog --env JAYLOG_URL=https://seu-app-jaylog -- npx -y jaylog-m
   "mcpServers": {
     "jaylog": {
       "command": "npx",
-      "args": ["-y", "jaylog-mcp"],
+      "args": ["-y", "github:Gpocas/jaylog-mcp"],
       "env": {
         "JAYLOG_URL": "https://seu-app-jaylog"
       }
@@ -62,9 +74,52 @@ claude mcp add jaylog --env JAYLOG_URL=https://seu-app-jaylog -- npx -y jaylog-m
 > Rodando via `npx`/Node, o arquivo `.env` **não** é lido. Defina as variáveis no shell ou no
 > bloco `env` do cliente MCP, como acima.
 
+O `dist/` não é versionado. Na primeira execução de cada commit novo, o npm instala as dependências
+de desenvolvimento e compila o projeto (script `prepare`). Por isso essa primeira inicialização
+leva alguns segundos a mais. As seguintes saem do cache local.
+
+### Atualizações
+
+Sem uma referência fixa (`github:Gpocas/jaylog-mcp`), o `npx` acompanha a branch `main`. **A cada
+inicialização** ele roda `git ls-remote` para descobrir o commit atual da `main` e compara com o
+que está no cache (`~/.npm/_npx`). Se o commit mudou, reinstala e recompila. Se não mudou, usa o
+cache. Ou seja, não é preciso limpar cache nem passar flags: basta **reiniciar o servidor MCP** (ou
+o cliente, ex. Claude Code/Claude Desktop), porque o processo em execução não se atualiza sozinho.
+
+Para conferir a versão, envie ao servidor a mensagem `initialize` do protocolo MCP, a mesma que o
+cliente envia ao conectar. A resposta traz a versão em `result.serverInfo.version`, lida do
+`package.json`:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"cli","version":"0"}}}' \
+  | npx -y github:Gpocas/jaylog-mcp 2>/dev/null
+# {"result":{...,"serverInfo":{"name":"Jaylog","version":"0.1.6"}},"jsonrpc":"2.0","id":1}
+```
+
+Esse comando passa pelo mesmo `npx`, então já atualiza para o commit atual da `main` antes de
+responder. Ele mostra a versão que o cliente MCP vai carregar na **próxima** inicialização. Uma
+sessão aberta antes da atualização continua com a versão antiga até ser reiniciada.
+
+Se mesmo assim uma versão antiga persistir (ex.: cache corrompido ou instalação interrompida),
+apague o cache do `npx` e reinicie o cliente:
+
+```bash
+rm -rf "$(npm config get cache)/_npx"            # Linux/macOS
+# Windows (PowerShell):
+# Remove-Item -Recurse -Force "$(npm config get cache)\_npx"
+```
+
+Para o comportamento oposto (fixar uma versão e **não** atualizar), aponte para um commit, branch
+ou tag com `#`:
+
+```bash
+npx -y github:Gpocas/jaylog-mcp#53eec55   # commit específico
+npx -y github:Gpocas/jaylog-mcp#v0.1.6    # tag (se existir)
+```
+
 ## Autenticação
 
-`npx -y jaylog-mcp login` abre o navegador numa tela de consentimento do app web do Jaylog
+`npx -y github:Gpocas/jaylog-mcp login` abre o navegador numa tela de consentimento do app web do Jaylog
 (`/mcp/authorize`) — o mesmo padrão do `claude login`/`gh auth login`: o MCP sobe um servidor HTTP
 local efêmero (`127.0.0.1:<porta>`), o navegador confirma sua identidade (sessão já logada ou
 login + 2FA) e, ao clicar em "Permitir", o Jaylog emite um token pessoal que volta pro MCP via esse
@@ -77,8 +132,8 @@ callback local.
 - `logout` apenas apaga a credencial local; para invalidar o token de fato, revogue-o no app.
 
 ```bash
-npx -y jaylog-mcp login     # autentica (abre o navegador)
-npx -y jaylog-mcp logout    # remove a credencial local
+npx -y github:Gpocas/jaylog-mcp login     # autentica (abre o navegador)
+npx -y github:Gpocas/jaylog-mcp logout    # remove a credencial local
 ```
 
 ## Configuração
@@ -99,11 +154,11 @@ no bloco `env` do cliente MCP, junto com o `JAYLOG_URL`:
 **Claude Code:**
 
 ```bash
-claude mcp add jaylog \
+claude mcp add jaylog --scope user \
   --env JAYLOG_URL=https://seu-app-jaylog \
   --env HTTPS_PROXY=http://proxy.empresa:8080 \
   --env NO_PROXY=localhost,127.0.0.1 \
-  -- npx -y jaylog-mcp
+  -- npx -y github:Gpocas/jaylog-mcp
 ```
 
 **Outros clientes (Claude Desktop, Cursor etc.):**
@@ -113,7 +168,7 @@ claude mcp add jaylog \
   "mcpServers": {
     "jaylog": {
       "command": "npx",
-      "args": ["-y", "jaylog-mcp"],
+      "args": ["-y", "github:Gpocas/jaylog-mcp"],
       "env": {
         "JAYLOG_URL": "https://seu-app-jaylog",
         "HTTPS_PROXY": "http://proxy.empresa:8080",
@@ -131,6 +186,9 @@ claude mcp add jaylog \
 - As variáveis também podem ser exportadas no shell (`export HTTPS_PROXY=...`) ao rodar o
   servidor manualmente. Nomes em minúsculas (`https_proxy`) também funcionam.
 - Sem nenhuma dessas variáveis, as requisições saem direto, como antes.
+- O `git` usado pelo `npx` para baixar o repositório também precisa passar pelo proxy. Ele respeita
+  `HTTPS_PROXY`/`HTTP_PROXY` do ambiente, ou configure de forma permanente com
+  `git config --global http.proxy http://proxy.empresa:8080`.
 
 ## Desenvolvimento
 
@@ -225,5 +283,5 @@ src/
 Como o MCP roda via stdio, use o [MCP Inspector](https://github.com/modelcontextprotocol/inspector):
 
 ```bash
-npx @modelcontextprotocol/inspector npx -y jaylog-mcp
+npx @modelcontextprotocol/inspector npx -y github:Gpocas/jaylog-mcp
 ```
