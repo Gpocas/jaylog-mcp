@@ -1,6 +1,6 @@
 ---
 name: jaylog-incident-report
-description: Gera um relatório de incidentes do ecossistema Jaylog em markdown (por padrão do dia anterior), consolidando erros nos logs, serviços parados, agendamentos não cumpridos e issues, depois de uma entrevista rápida de múltipla escolha para a pessoa personalizar escopo, período e conteúdo. Use sempre que o usuário pedir relatório de incidentes, resumo do que deu errado ontem, balanço diário de erros, "como foi a noite/o dia dos serviços", status dos bots/serviços, relatório dos meus serviços favoritos ou de um dono específico, ou health check diário, mesmo que não cite "Jaylog" nem "relatório" explicitamente.
+description: Gera um relatório de incidentes do ecossistema Jaylog em markdown (por padrão do dia anterior), consolidando erros nos logs, serviços parados, agendamentos não cumpridos, issues e máquinas com recursos no limite (CPU, memória, disco), depois de uma entrevista rápida de múltipla escolha para a pessoa personalizar escopo, período e conteúdo. Use sempre que o usuário pedir relatório de incidentes, resumo do que deu errado ontem, balanço diário de erros, "como foi a noite/o dia dos serviços", status dos bots/serviços, máquinas sobrecarregadas ou sem espaço em disco, relatório dos meus serviços favoritos ou de um dono específico, ou health check diário, mesmo que não cite "Jaylog" nem "relatório" explicitamente.
 ---
 
 # Relatório de incidentes Jaylog
@@ -16,14 +16,14 @@ Use a tool de perguntas de múltipla escolha (`AskUserQuestion`), numa única ch
 | Pergunta (cabeçalho) | Tipo | Opções |
 |---|---|---|
 | **Escopo**: de quais serviços? | única | Todos os serviços (Recomendado) · Só os meus favoritos · Serviços de um owner (nome ou e-mail) |
-| **Categorias**: o que entra? | múltipla | Erros nos logs · Serviços parados · Agendamentos não cumpridos · Issues |
+| **Categorias**: o que entra? | múltipla | Erros nos logs · Serviços parados · Agendamentos não cumpridos · Issues · Recursos das máquinas |
 | **Período**: qual janela? | única | Ontem (Recomendado) · Últimos 3 dias · Últimos 7 dias · (Outra: data ou intervalo) |
 | **Extras**: o que mais? | múltipla | Contatos de quem acionar · Mensagem/traceback completo dos erros principais · Só CRITICAL e EXCEPTION (ignorar ERROR) |
 
 Regras para não virar burocracia:
 
 - **Pergunte só o que falta.** Se o pedido já responde algo ("relatório de ontem dos meus favoritos"), não pergunte de novo: omita essa pergunta e confirme a escolha na resposta final.
-- **Pule a entrevista** se a pessoa disser que quer o padrão, "rápido" ou "sem perguntas", ou se a skill estiver rodando sem ninguém para responder (rotina agendada, `/loop`). Nesse caso use o **padrão**: todos os serviços, as quatro categorias, ontem, com contatos e mensagens completas, todos os níveis de erro.
+- **Pule a entrevista** se a pessoa disser que quer o padrão, "rápido" ou "sem perguntas", ou se a skill estiver rodando sem ninguém para responder (rotina agendada, `/loop`). Nesse caso use o **padrão**: todos os serviços, as cinco categorias, ontem, com contatos e mensagens completas, todos os níveis de erro.
 - **Sem a tool de perguntas** (outro cliente, por exemplo), faça as mesmas perguntas numa única mensagem de texto, com opções numeradas, e espere a resposta.
 - Nada marcado em "Categorias" significa todas; nada marcado em "Extras" significa que os extras ficam de fora (foi uma escolha).
 - Se escolheu "Serviços de um owner", faça uma pergunta de texto curta pedindo o nome ou e-mail do dono.
@@ -62,6 +62,7 @@ Faça as chamadas independentes em paralelo. Cada categoria selecionada é um ti
 
 **b) Serviços parados**
 - `get-latest-logs` traz o último log por instância com dados de liveness (execução ativa, última atividade, múltiplas execuções vivas).
+- Para cada instância parada ou sem atividade recente, `get-resource-usage` (filtro `service` e `include_stopped: true`) mostra se a máquina estava no limite (CPU, memória, disco) ou se o processo vinha crescendo em memória antes de parar. Isso ajuda a separar "caiu por falta de recurso" de "parou por outro motivo". As amostras só existem para as últimas 48 h.
 - Considere incidente: instância sem execução ativa que deveria estar rodando, última atividade muito antiga, ou mais de uma execução viva ao mesmo tempo (duplicidade). Um serviço agendado que roda e termina normalmente não está "parado": confira com os agendamentos antes de classificar.
 
 **c) Agendamentos não cumpridos**
@@ -71,6 +72,12 @@ Faça as chamadas independentes em paralelo. Cada categoria selecionada é um ti
 
 **d) Issues**
 - `list-issues` e filtre pelas que foram criadas ou alteradas na janela, usando os campos de data que a resposta trouxer. Se a resposta não tiver campo de data, diga isso em vez de adivinhar, e liste as abertas (`state: open`/`working`) dos serviços que tiveram incidentes.
+
+**e) Recursos das máquinas**
+- `get-resource-usage` mostra, por instância, o uso atual e o pico/média de CPU, memória e disco, além de alertas prontos (CPU ou memória alta, disco acima de 90%, memória do processo crescendo, instância sem amostras). Com escopo "todos", chame sem filtro (a tool limita a 40 instâncias e avisa). Com favoritos ou owner, chame uma vez por serviço do escopo.
+- Use `hours` cobrindo a janela do relatório até agora (máximo 48). As métricas só ficam guardadas por 48 h, então numa janela maior que isso diga que os dias mais antigos não puderam ser verificados.
+- Considere incidente as instâncias com `alerts`, exceto a que só diz "sem amostras", que já entra em (b) como parada. Os valores `host_*` são da máquina inteira: vários serviços na mesma máquina vão mostrar os mesmos números. Agrupe por máquina para não repetir o mesmo problema.
+- Para entender um pico específico (por exemplo, no horário de um erro), use `get-host-metrics` daquela instância, que traz a série minuto a minuto.
 
 Em todas as categorias, descarte o que não pertence aos serviços do escopo (etapa 2).
 
@@ -99,6 +106,7 @@ Escopo: <todos os serviços | favoritos de <usuário> | serviços de <owner>> ·
 - N serviços parados
 - N agendamentos não cumpridos
 - N issues abertas/alteradas
+- N máquinas com recursos no limite
 
 Prioridades: 1–3 linhas dizendo o que atacar primeiro e por quê.
 
@@ -116,6 +124,9 @@ Prioridades: 1–3 linhas dizendo o que atacar primeiro e por quê.
 
 ## Issues
 | Issue | Serviço | Estado | Responsável | Observação |
+
+## Recursos das máquinas
+| Máquina | Serviços afetados | Alerta | Agora / pico | Contato |
 
 ## Limitações
 O que não pôde ser verificado ou foi amostrado (resposta truncada, categoria sem campo de data etc.).

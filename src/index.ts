@@ -10,6 +10,7 @@ import { registerErrorSummaryTools } from './tools/errorSummary'
 import { registerIssueTools } from './tools/issues'
 import { registerKeyUserTools } from './tools/keyUsers'
 import { registerLogTools } from './tools/logs'
+import { registerResourceUsageTools } from './tools/resourceUsage'
 import { registerScheduleTools } from './tools/schedules'
 import { registerServiceTools } from './tools/services'
 
@@ -25,6 +26,7 @@ async function runServer() {
 
   registerLogTools(server)
   registerErrorSummaryTools(server)
+  registerResourceUsageTools(server)
   registerServiceTools(server)
   registerScheduleTools(server)
   registerKeyUserTools(server)

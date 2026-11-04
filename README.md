@@ -214,6 +214,7 @@ bun run build          # compila para dist/ (uso via Node/bin)
 - **`get-error-history`**: histórico diário consolidado de erros por serviço (janela maior que o histograma).
 - **`get-error-summary`**: erros acumulados de um serviço nos últimos N dias (padrão e máximo: 45), com o total do serviço (histórico diário consolidado) e a divisão por instância (host + usuário), ordenada pela que mais erra. Os números por instância vêm dos logs brutos, que guardam só os ~1000 mais recentes de cada instância. Os campos `window_fully_covered` e `possibly_pruned` indicam quando eles não cobrem a janela inteira.
 - **`get-host-metrics`**: uso de CPU/memória/disco/I/O de uma instância ao longo do tempo, com os limites de hardware da máquina.
+- **`get-resource-usage`**: visão de "gerenciador de tarefas" das instâncias em execução, filtrável por serviço e/ou máquina. Mostra CPU, memória e disco da máquina e CPU e memória do processo agora, mais média, pico, tendência de memória do processo e I/O nas últimas N horas (padrão 1, máximo 48). Também traz alertas prontos: CPU, memória ou disco alto, possível vazamento de memória e instância sem amostras recentes.
 - **`list-hosts`**: instâncias registradas (ambiente, versão do Python/jaylog, estado do git, venv).
 - **`get-host-stats`**: contagem agregada por modo de execução, versão do Python/jaylog, tipo de venv e branch do git.
 
@@ -298,7 +299,7 @@ Vale reinstalar também se as suas skills ainda mandam rodar `npx -y jaylog-mcp 
 instalação antiga via npmjs, que não é mais usada.
 
 - **`jaylog-incident-report`**: relatório em markdown de incidentes (erros nos logs, serviços
-  parados, agendamentos não cumpridos e issues). Começa com uma entrevista de múltipla escolha
+  parados, agendamentos não cumpridos, issues e máquinas com recursos no limite). Começa com uma entrevista de múltipla escolha
   para personalizar escopo (todos, favoritos ou serviços de um owner), categorias, período
   (padrão: dia anterior) e extras (contatos, mensagens completas, só críticos). Salva em
   `./reports/incidentes-AAAA-MM-DD.md`.
@@ -322,12 +323,13 @@ src/
 ├── index.ts        → bootstrap do McpServer (stdio)
 ├── api.ts          → fetch autenticado contra a API do Jaylog
 └── tools/
-    ├── logs.ts         → logs, métricas, recursos, hosts
-    ├── services.ts     → serviços
-    ├── schedules.ts    → agendamento de tarefas
-    ├── keyUsers.ts     → usuários chave
-    ├── errorSummary.ts → erros acumulados por serviço/instância
-    └── issues.ts       → erros/issues
+    ├── logs.ts          → logs, métricas, recursos, hosts
+    ├── services.ts      → serviços
+    ├── schedules.ts     → agendamento de tarefas
+    ├── keyUsers.ts      → usuários chave
+    ├── errorSummary.ts  → erros acumulados por serviço/instância
+    ├── resourceUsage.ts → uso de recursos por instância (task manager)
+    └── issues.ts        → erros/issues
 ```
 
 ## Debugging

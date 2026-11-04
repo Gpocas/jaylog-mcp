@@ -48,7 +48,7 @@ Nem todo erro se corrige no código; dizer isso evita um patch inútil:
 
 - **Bug no código** (None não tratado, índice, tipo, regra de negócio): proponha a correção.
 - **Dependência externa** (API fora do ar, timeout, login expirado, mudança de layout em site/sistema): proponha resiliência (retry, validação, mensagem melhor), deixando claro que a causa raiz é externa.
-- **Recurso da máquina** (memória, disco, CPU): confirme com `get-host-metrics` (`service`, `hostname`, `username`; amostras ficam 48 h) antes de culpar o código.
+- **Recurso da máquina** (memória, disco, CPU): confirme antes de culpar o código. `get-resource-usage` (`service`, `hours` até 48) dá a visão geral por instância: uso atual, picos e alertas, incluindo memória do processo crescendo, que sugere vazamento. Para ver o que aconteceu no minuto do erro, use `get-host-metrics` (`service`, `hostname`, `username`) e compare o horário do log com a série. As amostras ficam só 48 h. Erros como `MemoryError`, timeouts ou falhas de escrita em disco combinados com um pico na mesma hora apontam para recurso. Nesse caso a correção pode ser no código (vazamento, arquivos temporários que não são apagados) ou na máquina.
 - **Ambiente/configuração** (versão de Python/biblioteca, venv, variável de ambiente): `list-hosts` mostra o ambiente reportado; aponte a divergência.
 
 ## 6. Entregar as propostas

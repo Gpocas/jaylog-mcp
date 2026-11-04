@@ -37,7 +37,7 @@ Passe pelos filtros abaixo, nesta ordem. Cada "não abra" economiza uma notifica
 1. **Já corrigido numa versão mais nova** (o commit da correção existe, mas a instância roda um commit anterior): não abra issue de bug. Diga ao usuário qual commit corrige e que o caminho é atualizar a instância (deploy/`git pull`). Se quem pode atualizar é outra pessoa, recomende falar com o dono do serviço. Abrir issue só para cobrar deploy de algo já resolvido incomoda e não acelera nada.
 2. **Já existe issue aberta para o mesmo problema**: rode `list-issues` com `service` (e `title` com palavras-chave do erro), olhando os estados `open` e `working`. Se uma delas descreve o mesmo sintoma ou a mesma causa, não abra outra. Mostre a existente (id, título, responsável). Se houver evidência nova, sugira acrescentá-la à descrição com `update-issue`, o que só funciona se o usuário for o autor (senão, combine com o autor ou com o responsável).
 3. **Já houve issue `merged` ou `closed` para o mesmo problema**: é uma **regressão** ou uma correção incompleta. Abra uma issue nova (as fechadas não podem ser reeditadas) e cite o id da anterior na descrição, com o `commit` e a `solution` dela, se houver (`get-issue`).
-4. **Não é bug do serviço**: falha pontual de dependência externa que já se normalizou, erro de uso, credencial expirada ou máquina sem recurso. Explique por que provavelmente não cabe issue e pergunte se o usuário quer abrir mesmo assim, por exemplo para pedir mais resiliência ou monitoramento. Nesse caso, o título deve deixar claro que o pedido é esse.
+4. **Não é bug do serviço**: falha pontual de dependência externa que já se normalizou, erro de uso, credencial expirada ou máquina sem recurso. Para conferir o último caso, use `get-resource-usage` (últimas 48 h) e `get-host-metrics` no horário do erro. Se o próprio processo vinha crescendo em memória (`proc_mem_change_pct` alto), o problema pode ser do código, como um vazamento de memória, e aí cabe issue. Explique por que provavelmente não cabe issue e pergunte se o usuário quer abrir mesmo assim, por exemplo para pedir mais resiliência ou monitoramento. Nesse caso, o título deve deixar claro que o pedido é esse.
 5. **Mais de um problema misturado**: uma issue por problema. Erros com causas diferentes, abertos juntos, não conseguem ser fechados juntos.
 
 Se a decisão for não abrir, termine aqui com a explicação e o próximo passo recomendado.
@@ -85,6 +85,7 @@ Dados reais costumam ter informação sensível. Troque CPF, CNPJ, nomes, e-mail
 ## Versão / ambiente
 - Instância: <hostname> — branch `<branch>`, commit `<commit>`
 - Python <versão>, jaylog <versão>
+- Recursos no momento do erro (se relevante): CPU <x>%, memória <y>%, disco <z>% (de `get-resource-usage`/`get-host-metrics`)
 - Testado na versão mais recente (`origin/main` @ `<commit>`)? <sim, continua acontecendo | não foi possível testar>
 
 ## EMR (Exemplo Mínimo Reproduzível)
