@@ -6,6 +6,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { login } from './auth/login'
 import { logout } from './auth/logout'
 import { colors } from './cli/colors'
+import { registerErrorSummaryTools } from './tools/errorSummary'
 import { registerIssueTools } from './tools/issues'
 import { registerKeyUserTools } from './tools/keyUsers'
 import { registerLogTools } from './tools/logs'
@@ -23,6 +24,7 @@ async function runServer() {
   })
 
   registerLogTools(server)
+  registerErrorSummaryTools(server)
   registerServiceTools(server)
   registerScheduleTools(server)
   registerKeyUserTools(server)

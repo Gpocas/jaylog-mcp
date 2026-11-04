@@ -17,6 +17,7 @@ Se as tools do Jaylog (`list-issues`, `create-issue` etc.) não estiverem dispon
   - `list-logs` com `service` e níveis `ERROR`/`CRITICAL`/`EXCEPTION`, na janela em que o problema aconteceu.
   - `get-log` no exemplar mais recente, para ter a mensagem completa e o traceback.
   - `get-error-history` para saber desde quando acontece e se está piorando.
+  - `get-error-summary` para o tamanho do problema: total de erros do serviço nos últimos 45 dias e quais instâncias (host + usuário) são afetadas. Isso alimenta a seção "Impacto" da issue. Erro numa instância só também sugere causa de ambiente ou versão (seção 2).
   - Anote ids dos logs, primeira e última ocorrência, hosts e usuários afetados.
 
 ## 2. Descobrir em qual versão o erro acontece
@@ -101,6 +102,7 @@ Dados reais costumam ter informação sensível. Troque CPF, CNPJ, nomes, e-mail
 
 ## Evidências
 - Logs no Jaylog: <ids>, de <primeira> a <última ocorrência>
+- Volume: <N> erros nos últimos <dias> dias, em <instâncias afetadas> (de `get-error-summary`)
 - <issue anterior relacionada, se regressão: id + commit/solução>
 ```
 
@@ -123,7 +125,7 @@ Se o usuário também vai corrigir o bug (ou pedir ajuda com isso depois), siga 
 2. **Planeje a solução.** Parta da causa raiz da seção 4, não do sintoma. Um `try/except` em volta da linha que estoura esconde o erro, não corrige. Liste as alternativas, escolha a menor mudança que elimina a causa e explique por que ela é melhor. Se a causa for externa (API, sistema, rede), o plano é resiliência: validação, retry com limite, mensagem de erro clara e log útil.
 3. **Avalie o que a alteração pode impactar.** Quem chama o código alterado, outros fluxos do mesmo serviço, outros serviços que usam o mesmo módulo ou dado, formato de saída (arquivos, banco, integrações), dados já gravados de forma errada (precisam de correção retroativa?), deploy (variáveis, dependências) e como voltar atrás se der errado. Liste os riscos, com o mais grave primeiro.
 4. **Teste a solução com base no EMR.** O EMR tem que falhar antes da correção e passar depois. Se der, transforme-o num teste automatizado de regressão, para o erro não voltar sem ninguém perceber. Rode também os casos vizinhos levantados em "Pode voltar a acontecer quando".
-5. **Confirme em produção.** Depois do deploy, acompanhe pelo Jaylog: `list-hosts` mostra se a instância está no commit novo, e `list-logs`/`get-error-history` mostram se o erro parou de aparecer.
+5. **Confirme em produção.** Depois do deploy, acompanhe pelo Jaylog: `list-hosts` mostra se a instância está no commit novo, e `list-logs`/`get-error-history`/`get-error-summary` (com `days` curto, a partir do deploy) mostram se o erro parou de aparecer em todas as instâncias.
 6. **Feche a issue com o registro da solução.** Use `update-issue` com `state: "merged"`, `commit` (hash da correção, até 50 caracteres) e `solution` na mesma chamada, porque a API só aceita `commit` e `solution` junto com a mudança para `merged`. A `solution` (Markdown, até 3000 caracteres) deve dizer a causa, o que mudou e como foi testado (o EMR e o teste de regressão). Mostre a prévia antes: depois de `merged` a issue fica travada e o autor recebe e-mail. Só o responsável pode registrar a solução. Se o usuário não for o responsável, reatribua antes (`assignee`) com o acordo dele, ou passe o texto para o responsável fechar. Se o problema não for corrigido (não é bug, duplicada, desistência), use `state: "closed"` em vez de `merged`.
 
 ## Cuidados

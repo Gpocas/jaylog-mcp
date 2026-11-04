@@ -57,6 +57,7 @@ Faça as chamadas independentes em paralelo. Cada categoria selecionada é um ti
 - `list-logs` com a janela e `log_level` = `ERROR`, `CRITICAL` e `EXCEPTION` (uma chamada por nível, o filtro é exato), mais `is_exception: true` se `EXCEPTION` não retornar nada, pois exceções às vezes vêm marcadas só por essa flag. Se a pessoa pediu "só CRITICAL e EXCEPTION", pule `ERROR`.
 - Agrupe por serviço e depois por mensagem parecida (ignore ids, timestamps e números variáveis ao comparar). Conte ocorrências, anote primeira e última ocorrência e os hosts afetados.
 - Se a resposta vier enorme ou truncada, use `get-error-history` para dimensionar e `list-logs` com filtro por serviço só nos mais ofensores. Registre no relatório que a amostra foi parcial.
+- Para os serviços mais ofensores, `get-error-summary` (com `days` igual à janela) mostra quais instâncias (host + usuário) concentram os erros. Isso diz se o problema é de uma máquina só ou do serviço todo. Com janela de vários dias, ela também dá o total acumulado do serviço.
 - Se escolheu o extra de mensagem completa, use `get-log` nos 1–3 erros mais relevantes de cada serviço; a lista pode estar resumida. Sem o extra, basta a mensagem principal.
 
 **b) Serviços parados**

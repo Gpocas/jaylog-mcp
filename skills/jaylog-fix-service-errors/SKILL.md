@@ -21,6 +21,7 @@ Se as tools do Jaylog não estiverem disponíveis, avise que o MCP não está co
 
 Janela padrão: últimos 7 dias, ou a que o usuário indicar.
 
+- `get-error-summary` para o tamanho do problema: total acumulado do serviço nos últimos 45 dias (ou `days` menor) e a divisão por instância (host + usuário). Erro concentrado numa instância aponta para ambiente, versão ou máquina, e não para o código em si. Leve isso para a seção 3. Nas instâncias com `possibly_pruned: true`, os números por instância cobrem só os logs mais recentes.
 - `get-error-history` (`from`/`to`) para ver a tendência diária: o problema é novo, constante ou piorando? Isso orienta a prioridade.
 - `list-logs` com `service` e `log_level` = `ERROR`, `CRITICAL` (e `EXCEPTION`, ou `is_exception: true`), um nível por chamada. Restrinja o intervalo se vier volume demais.
 - Agrupe erros equivalentes (mesma mensagem ignorando ids, números e timestamps). Para cada grupo, registre: nº de ocorrências, primeira/última, hosts e usuários afetados, `service_path`.
@@ -32,6 +33,7 @@ Janela padrão: últimos 7 dias, ou a que o usuário indicar.
 O código local pode não ser o que está em produção, e corrigir uma versão diferente gera propostas erradas.
 
 - `list-hosts` (`service_id`, `live: true`) traz o estado do git reportado pela instância (branch, commit/versão do jaylog e do Python).
+- Se o `get-error-summary` mostrou erros só em algumas instâncias, compare a versão e o ambiente delas com os das instâncias sem erro. A diferença costuma ser a causa.
 - Compare com o repositório local (`git branch --show-current`, `git log --oneline -5`). Se divergirem (outro branch, commit que não existe local ou muito atrás), avise e diga o que mudou no trecho relevante (`git log`/`git diff` nos arquivos citados) antes de propor algo.
 
 ## 4. Localizar o código

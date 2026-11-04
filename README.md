@@ -212,6 +212,7 @@ bun run build          # compila para dist/ (uso via Node/bin)
 - **`get-log`**: um log específico por ID, com a mensagem completa.
 - **`get-error-histogram`**: histograma de contagem de logs/erros por período, a partir dos logs brutos (janela limitada pela retenção).
 - **`get-error-history`**: histórico diário consolidado de erros por serviço (janela maior que o histograma).
+- **`get-error-summary`**: erros acumulados de um serviço nos últimos N dias (padrão e máximo: 45), com o total do serviço (histórico diário consolidado) e a divisão por instância (host + usuário), ordenada pela que mais erra. Os números por instância vêm dos logs brutos, que guardam só os ~1000 mais recentes de cada instância. Os campos `window_fully_covered` e `possibly_pruned` indicam quando eles não cobrem a janela inteira.
 - **`get-host-metrics`**: uso de CPU/memória/disco/I/O de uma instância ao longo do tempo, com os limites de hardware da máquina.
 - **`list-hosts`**: instâncias registradas (ambiente, versão do Python/jaylog, estado do git, venv).
 - **`get-host-stats`**: contagem agregada por modo de execução, versão do Python/jaylog, tipo de venv e branch do git.
@@ -321,11 +322,12 @@ src/
 ├── index.ts        → bootstrap do McpServer (stdio)
 ├── api.ts          → fetch autenticado contra a API do Jaylog
 └── tools/
-    ├── logs.ts      → logs, métricas, recursos, hosts
-    ├── services.ts  → serviços
-    ├── schedules.ts → agendamento de tarefas
-    ├── keyUsers.ts  → usuários chave
-    └── issues.ts    → erros/issues
+    ├── logs.ts         → logs, métricas, recursos, hosts
+    ├── services.ts     → serviços
+    ├── schedules.ts    → agendamento de tarefas
+    ├── keyUsers.ts     → usuários chave
+    ├── errorSummary.ts → erros acumulados por serviço/instância
+    └── issues.ts       → erros/issues
 ```
 
 ## Debugging
