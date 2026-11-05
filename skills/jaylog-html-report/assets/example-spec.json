@@ -3620,9 +3620,11 @@
    "items": [
     {
      "label": "Erros no período",
+     "icon": "erros",
      "query": {
       "dataset": "erros"
      },
+     "trend": true,
      "hint": "Soma de todos os níveis em 45 dias",
      "status": "critical",
      "status_label": "Subindo desde 21/10",
@@ -3630,12 +3632,14 @@
     },
     {
      "label": "Erros graves (CRITICAL)",
+     "icon": "critico",
      "query": {
       "dataset": "erros",
       "where": {
        "level": "CRITICAL"
       }
      },
+     "trend": true,
      "hint": "Os que costumam parar o processo",
      "filter": {
       "level": "CRITICAL"
@@ -3644,6 +3648,7 @@
     },
     {
      "label": "Máquinas com erro",
+     "icon": "maquina",
      "query": {
       "dataset": "erros",
       "agg": "distinct",
@@ -3654,6 +3659,7 @@
     },
     {
      "label": "Tipos de erro diferentes",
+     "icon": "lista",
      "query": {
       "dataset": "erros",
       "agg": "distinct",
@@ -3664,8 +3670,16 @@
     },
     {
      "label": "Disco da VM01",
+     "icon": "disco",
      "value": 91,
      "unit": "%",
+     "meter": {
+      "max": 100,
+      "thresholds": [
+       80,
+       90
+      ]
+     },
      "status": "warning",
      "status_label": "Quase cheio",
      "hint": "Acima de 90% pode travar o robô",

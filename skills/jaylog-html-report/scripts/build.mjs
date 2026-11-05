@@ -18,6 +18,7 @@ const COLUMN_FORMATS = ['text', 'number', 'code', 'date', 'status', 'level', 'li
 const AGGS = ['sum', 'count', 'avg', 'max', 'min', 'distinct']
 const SEVERITY_NAMES = ['ERROR', 'EXCEPTION', 'CRITICAL']
 const FILTER_KINDS = ['values', 'date-range']
+const KPI_ICONS = ['erros', 'alerta', 'erro', 'critico', 'maquina', 'servico', 'cpu', 'memoria', 'disco', 'tempo', 'calendario', 'issue', 'usuario', 'grafico', 'barras', 'lista', 'check', 'percentual', 'filtro', 'info']
 
 const errors = []
 const warnings = []
@@ -291,6 +292,17 @@ function validate(spec) {
   if (spec.glossary !== undefined && (!isObj(spec.glossary) || Object.values(spec.glossary).some(v => !isStr(v))))
     fail('glossary', 'objeto { "TERMO": "explicação em linguagem simples" }')
   if (spec.labels !== undefined && !isObj(spec.labels)) fail('labels', 'objeto { "campo": "Rótulo" }')
+  if (spec.hotspots !== undefined) {
+    if (!isObj(spec.hotspots)) fail('hotspots', 'objeto { "field": "error", "dataset"?: "...", "label"?: "..." }')
+    else {
+      if (spec.hotspots.dataset !== undefined && !datasets[spec.hotspots.dataset]) fail('hotspots.dataset', `dataset "${spec.hotspots.dataset}" não existe`)
+      if (spec.hotspots.field !== undefined) {
+        if (spec.hotspots.dataset && datasets[spec.hotspots.dataset]) checkField('hotspots.field', spec.hotspots.dataset, spec.hotspots.field)
+        else if (!anyField(spec.hotspots.field)) fail('hotspots.field', `nenhum dataset tem o campo "${spec.hotspots.field}"`)
+      }
+      if (spec.hotspots.label !== undefined && !isStr(spec.hotspots.label)) fail('hotspots.label', 'texto')
+    }
+  }
 
   if (!isArr(spec.sections) || spec.sections.length === 0) return fail('sections', 'informe ao menos uma seção')
   const ids = new Set()
@@ -313,7 +325,28 @@ function validate(spec) {
           const ip = `${p}.items[${j}]`
           if (!isStr(item.label)) fail(`${ip}.label`, 'rótulo obrigatório')
           if (item.status !== undefined && !STATUSES.includes(item.status)) fail(`${ip}.status`, `use um de: ${STATUSES.join(', ')}`)
+          if (item.icon !== undefined && !KPI_ICONS.includes(item.icon)) fail(`${ip}.icon`, `use um de: ${KPI_ICONS.join(', ')}`)
           if (item.query !== undefined) checkQueryBase(`${ip}.query`, item.query)
+          if (item.meter !== undefined) {
+            if (!isObj(item.meter)) fail(`${ip}.meter`, 'objeto { "max"?: 100, "thresholds"?: [80, 90] }')
+            else {
+              const max = item.meter.max ?? 100
+              if (!(typeof max === 'number' && max > 0)) fail(`${ip}.meter.max`, 'número positivo')
+              if (item.meter.thresholds !== undefined) {
+                const t = item.meter.thresholds
+                if (!isArr(t) || t.length === 0 || t.length > 2 || t.some(v => !(typeof v === 'number' && v > 0 && v <= max)) || (t.length === 2 && t[0] >= t[1]))
+                  fail(`${ip}.meter.thresholds`, '1 ou 2 limites em ordem crescente, positivos e menores ou iguais a "max" (ex.: [80, 90])')
+              }
+            }
+          }
+          if (item.trend !== undefined) {
+            if (item.trend === true) {
+              if (!item.query) fail(`${ip}.trend`, '"trend: true" exige "query" (ou passe uma lista de números)')
+              else if (datasets[item.query.dataset] && !spec.datasets?.[item.query.dataset]?.time)
+                fail(`${ip}.trend`, `o dataset "${item.query.dataset}" precisa de "time" para calcular "trend: true"`)
+            } else if (!(isArr(item.trend) && item.trend.length >= 2 && item.trend.every(v => typeof v === 'number' && Number.isFinite(v))))
+              fail(`${ip}.trend`, '"true" (com "query") ou lista com pelo menos 2 números')
+          }
           checkFocus(ip, item, ids)
         })
         break
