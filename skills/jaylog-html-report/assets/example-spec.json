@@ -1,1483 +1,4170 @@
 {
-  "title": "Panorama — Robô Faturamento",
-  "subtitle": "Erros dos últimos 45 dias e uso de recursos das instâncias",
-  "period": "20/09/2026 a 03/11/2026",
-  "source": "Jaylog MCP — get-error-summary, get-error-history, get-resource-usage, get-host-metrics, list-logs",
-  "sections": [
+ "title": "Panorama — Robô Faturamento",
+ "subtitle": "Erros dos últimos 45 dias e uso de recursos das instâncias",
+ "period": "20/09/2026 a 03/11/2026",
+ "source": "Jaylog MCP — get-error-summary, get-error-history, get-resource-usage, get-host-metrics, list-logs, list-issues",
+ "labels": {
+  "instance": "Instância",
+  "level": "Nível",
+  "error": "Erro",
+  "date": "Dia",
+  "weekday": "Dia da semana",
+  "hour": "Hora"
+ },
+ "datasets": {
+  "erros": {
+   "label": "Erros (list-logs agregado por dia, hora, instância, nível e mensagem)",
+   "value": "count",
+   "unit": "erros",
+   "time": "date",
+   "dimensions": [
+    "instance",
+    "level",
+    "error",
+    "weekday"
+   ],
+   "rows": [
     {
-      "type": "kpis",
-      "items": [
-        {
-          "label": "Erros em 45 dias",
-          "value": 715,
-          "hint": "ERROR + EXCEPTION + CRITICAL",
-          "status": "critical",
-          "status_label": "Subindo desde 21/10"
-        },
-        {
-          "label": "Instâncias com erro",
-          "value": 2,
-          "unit": "de 3"
-        },
-        {
-          "label": "Pico diário",
-          "value": 37,
-          "unit": "erros",
-          "hint": "28/10/2026"
-        },
-        {
-          "label": "Disco da VM01",
-          "value": 91,
-          "unit": "%",
-          "status": "warning",
-          "status_label": "Acima de 90%"
-        }
-      ]
+     "date": "2026-09-21",
+     "weekday": "seg",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
     },
     {
-      "type": "alerts",
-      "title": "Alertas",
-      "items": [
-        {
-          "severity": "critical",
-          "title": "CPU da VM01 em 95% agora",
-          "detail": "Média de 64% nas últimas 2 h; a VM01 roda também o Bot Cadastro."
-        },
-        {
-          "severity": "warning",
-          "title": "Memória do processo cresceu 144% em 2 h",
-          "detail": "Padrão de vazamento: 270 MB → 660 MB sem queda."
-        },
-        {
-          "severity": "info",
-          "title": "VM02 sem amostras há 1 h",
-          "detail": "Última atividade às 22:44; confira se a execução terminou normalmente."
-        }
-      ]
+     "date": "2026-09-21",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
     },
     {
-      "type": "chart",
-      "title": "Erros por dia e nível",
-      "description": "Histórico diário consolidado (get-error-history). O volume sobe a partir de 21/10.",
-      "chart": {
-        "kind": "bar",
-        "stacked": true,
-        "palette": "severity",
-        "dates": true,
-        "categories": [
-          "2026-09-20",
-          "2026-09-21",
-          "2026-09-22",
-          "2026-09-23",
-          "2026-09-24",
-          "2026-09-25",
-          "2026-09-26",
-          "2026-09-27",
-          "2026-09-28",
-          "2026-09-29",
-          "2026-09-30",
-          "2026-10-01",
-          "2026-10-02",
-          "2026-10-03",
-          "2026-10-04",
-          "2026-10-05",
-          "2026-10-06",
-          "2026-10-07",
-          "2026-10-08",
-          "2026-10-09",
-          "2026-10-10",
-          "2026-10-11",
-          "2026-10-12",
-          "2026-10-13",
-          "2026-10-14",
-          "2026-10-15",
-          "2026-10-16",
-          "2026-10-17",
-          "2026-10-18",
-          "2026-10-19",
-          "2026-10-20",
-          "2026-10-21",
-          "2026-10-22",
-          "2026-10-23",
-          "2026-10-24",
-          "2026-10-25",
-          "2026-10-26",
-          "2026-10-27",
-          "2026-10-28",
-          "2026-10-29",
-          "2026-10-30",
-          "2026-10-31",
-          "2026-11-01",
-          "2026-11-02",
-          "2026-11-03"
-        ],
-        "unit": "erros",
-        "series": [
-          {
-            "name": "ERROR",
-            "values": [
-              4,
-              10,
-              6,
-              5,
-              8,
-              7,
-              6,
-              9,
-              9,
-              7,
-              8,
-              8,
-              9,
-              5,
-              6,
-              8,
-              8,
-              4,
-              8,
-              7,
-              10,
-              9,
-              5,
-              7,
-              10,
-              8,
-              8,
-              7,
-              9,
-              9,
-              6,
-              20,
-              23,
-              20,
-              19,
-              20,
-              21,
-              20,
-              24,
-              21,
-              22,
-              23,
-              18,
-              20,
-              21
-            ]
-          },
-          {
-            "name": "EXCEPTION",
-            "values": [
-              3,
-              2,
-              2,
-              4,
-              1,
-              2,
-              2,
-              3,
-              4,
-              3,
-              1,
-              2,
-              2,
-              2,
-              2,
-              2,
-              3,
-              3,
-              2,
-              4,
-              2,
-              4,
-              3,
-              3,
-              3,
-              3,
-              3,
-              4,
-              2,
-              3,
-              2,
-              8,
-              7,
-              7,
-              7,
-              8,
-              9,
-              6,
-              8,
-              6,
-              7,
-              6,
-              6,
-              9,
-              7
-            ]
-          },
-          {
-            "name": "CRITICAL",
-            "values": [
-              0,
-              0,
-              0,
-              0,
-              0,
-              1,
-              0,
-              0,
-              0,
-              1,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0,
-              1,
-              0,
-              1,
-              0,
-              1,
-              0,
-              1,
-              0,
-              0,
-              5,
-              0,
-              0,
-              0,
-              0,
-              0,
-              0
-            ]
-          }
-        ]
-      }
+     "date": "2026-09-21",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
     },
     {
-      "type": "chart",
-      "title": "Erros por instância (45 dias)",
-      "description": "Soma dos níveis por host + usuário (get-error-summary).",
-      "chart": {
-        "kind": "bar",
-        "horizontal": true,
-        "categories": [
-          "VM01 · bot",
-          "VM02 · bot",
-          "VM03 · bot"
-        ],
-        "unit": "erros",
-        "height": 220,
-        "series": [
-          {
-            "name": "Erros",
-            "values": [
-              512,
-              203,
-              0
-            ]
-          }
-        ]
-      }
+     "date": "2026-09-21",
+     "weekday": "seg",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
     },
     {
-      "type": "chart",
-      "title": "Uso de recursos — VM01 (últimas 48 h)",
-      "description": "Médias por hora (get-host-metrics). Linhas tracejadas: limites de atenção e crítico.",
-      "chart": {
-        "kind": "line",
-        "dates": true,
-        "x": [
-          "2026-11-03T00:00",
-          "2026-11-03T01:00",
-          "2026-11-03T02:00",
-          "2026-11-03T03:00",
-          "2026-11-03T04:00",
-          "2026-11-03T05:00",
-          "2026-11-03T06:00",
-          "2026-11-03T07:00",
-          "2026-11-03T08:00",
-          "2026-11-03T09:00",
-          "2026-11-03T10:00",
-          "2026-11-03T11:00",
-          "2026-11-03T12:00",
-          "2026-11-03T13:00",
-          "2026-11-03T14:00",
-          "2026-11-03T15:00",
-          "2026-11-03T16:00",
-          "2026-11-03T17:00",
-          "2026-11-03T18:00",
-          "2026-11-03T19:00",
-          "2026-11-03T20:00",
-          "2026-11-03T21:00",
-          "2026-11-03T22:00",
-          "2026-11-03T23:00",
-          "2026-11-04T00:00",
-          "2026-11-04T01:00",
-          "2026-11-04T02:00",
-          "2026-11-04T03:00",
-          "2026-11-04T04:00",
-          "2026-11-04T05:00",
-          "2026-11-04T06:00",
-          "2026-11-04T07:00",
-          "2026-11-04T08:00",
-          "2026-11-04T09:00",
-          "2026-11-04T10:00",
-          "2026-11-04T11:00",
-          "2026-11-04T12:00",
-          "2026-11-04T13:00",
-          "2026-11-04T14:00",
-          "2026-11-04T15:00",
-          "2026-11-04T16:00",
-          "2026-11-04T17:00",
-          "2026-11-04T18:00",
-          "2026-11-04T19:00",
-          "2026-11-04T20:00",
-          "2026-11-04T21:00",
-          "2026-11-04T22:00",
-          "2026-11-04T23:00"
-        ],
-        "unit": "%",
-        "y_min": 0,
-        "y_max": 100,
-        "thresholds": [
-          {
-            "value": 80,
-            "status": "warning",
-            "label": "Atenção"
-          },
-          {
-            "value": 90,
-            "status": "critical",
-            "label": "Crítico"
-          }
-        ],
-        "series": [
-          {
-            "name": "CPU da máquina",
-            "values": [
-              40.6,
-              45.7,
-              48.6,
-              48.9,
-              52.7,
-              61.3,
-              56,
-              60.2,
-              60.3,
-              50.9,
-              54,
-              49.5,
-              45.8,
-              40.5,
-              34.1,
-              26.9,
-              21.8,
-              22.9,
-              22.5,
-              18.2,
-              17.7,
-              21.1,
-              28,
-              29.3,
-              32.2,
-              39.3,
-              45.2,
-              46.7,
-              53.9,
-              54.8,
-              55.3,
-              57.4,
-              62.7,
-              61.4,
-              56,
-              54.5,
-              50.6,
-              40.1,
-              38.7,
-              29.7,
-              28.1,
-              59.8,
-              58.6,
-              58.2,
-              53.9,
-              52.1,
-              56.1,
-              56.8
-            ]
-          },
-          {
-            "name": "Memória da máquina",
-            "values": [
-              50,
-              50.2,
-              50.9,
-              51.3,
-              52.7,
-              52.1,
-              53.9,
-              52.3,
-              53.7,
-              55,
-              54.6,
-              56.8,
-              56.1,
-              56.5,
-              58.4,
-              58.3,
-              57.8,
-              60.5,
-              61.3,
-              62.1,
-              62.7,
-              62.6,
-              64.1,
-              61.9,
-              64.7,
-              64.8,
-              65.8,
-              66.9,
-              64.9,
-              65.8,
-              66.2,
-              66.9,
-              67.5,
-              67.8,
-              70.2,
-              71.8,
-              70.2,
-              70.6,
-              71.4,
-              73.4,
-              72.7,
-              74,
-              76.2,
-              75.1,
-              76.4,
-              77.3,
-              76.8,
-              77.4
-            ]
-          },
-          {
-            "name": "Disco",
-            "values": [
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91,
-              91
-            ]
-          }
-        ]
-      }
+     "date": "2026-09-21",
+     "weekday": "seg",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
     },
     {
-      "type": "chart",
-      "title": "Erros por dia da semana e hora",
-      "description": "Concentração dos erros nos últimos 7 dias (list-logs).",
-      "chart": {
-        "kind": "heatmap",
-        "x": [
-          "00h",
-          "01h",
-          "02h",
-          "03h",
-          "04h",
-          "05h",
-          "06h",
-          "07h",
-          "08h",
-          "09h",
-          "10h",
-          "11h",
-          "12h",
-          "13h",
-          "14h",
-          "15h",
-          "16h",
-          "17h",
-          "18h",
-          "19h",
-          "20h",
-          "21h",
-          "22h",
-          "23h"
-        ],
-        "y": [
-          "seg",
-          "ter",
-          "qua",
-          "qui",
-          "sex",
-          "sáb",
-          "dom"
-        ],
-        "unit": "erros",
-        "values": [
-          [
-            0,
-            0,
-            0
-          ],
-          [
-            1,
-            0,
-            0
-          ],
-          [
-            2,
-            0,
-            0
-          ],
-          [
-            3,
-            0,
-            1
-          ],
-          [
-            4,
-            0,
-            0
-          ],
-          [
-            5,
-            0,
-            1
-          ],
-          [
-            6,
-            0,
-            0
-          ],
-          [
-            7,
-            0,
-            0
-          ],
-          [
-            8,
-            0,
-            2
-          ],
-          [
-            9,
-            0,
-            5
-          ],
-          [
-            10,
-            0,
-            2
-          ],
-          [
-            11,
-            0,
-            1
-          ],
-          [
-            12,
-            0,
-            2
-          ],
-          [
-            13,
-            0,
-            6
-          ],
-          [
-            14,
-            0,
-            5
-          ],
-          [
-            15,
-            0,
-            4
-          ],
-          [
-            16,
-            0,
-            9
-          ],
-          [
-            17,
-            0,
-            1
-          ],
-          [
-            18,
-            0,
-            4
-          ],
-          [
-            19,
-            0,
-            0
-          ],
-          [
-            20,
-            0,
-            0
-          ],
-          [
-            21,
-            0,
-            0
-          ],
-          [
-            22,
-            0,
-            0
-          ],
-          [
-            23,
-            0,
-            0
-          ],
-          [
-            0,
-            1,
-            0
-          ],
-          [
-            1,
-            1,
-            1
-          ],
-          [
-            2,
-            1,
-            0
-          ],
-          [
-            3,
-            1,
-            0
-          ],
-          [
-            4,
-            1,
-            0
-          ],
-          [
-            5,
-            1,
-            1
-          ],
-          [
-            6,
-            1,
-            1
-          ],
-          [
-            7,
-            1,
-            0
-          ],
-          [
-            8,
-            1,
-            6
-          ],
-          [
-            9,
-            1,
-            5
-          ],
-          [
-            10,
-            1,
-            3
-          ],
-          [
-            11,
-            1,
-            4
-          ],
-          [
-            12,
-            1,
-            4
-          ],
-          [
-            13,
-            1,
-            4
-          ],
-          [
-            14,
-            1,
-            5
-          ],
-          [
-            15,
-            1,
-            6
-          ],
-          [
-            16,
-            1,
-            6
-          ],
-          [
-            17,
-            1,
-            6
-          ],
-          [
-            18,
-            1,
-            7
-          ],
-          [
-            19,
-            1,
-            1
-          ],
-          [
-            20,
-            1,
-            0
-          ],
-          [
-            21,
-            1,
-            1
-          ],
-          [
-            22,
-            1,
-            0
-          ],
-          [
-            23,
-            1,
-            0
-          ],
-          [
-            0,
-            2,
-            1
-          ],
-          [
-            1,
-            2,
-            1
-          ],
-          [
-            2,
-            2,
-            0
-          ],
-          [
-            3,
-            2,
-            0
-          ],
-          [
-            4,
-            2,
-            0
-          ],
-          [
-            5,
-            2,
-            1
-          ],
-          [
-            6,
-            2,
-            0
-          ],
-          [
-            7,
-            2,
-            0
-          ],
-          [
-            8,
-            2,
-            9
-          ],
-          [
-            9,
-            2,
-            7
-          ],
-          [
-            10,
-            2,
-            2
-          ],
-          [
-            11,
-            2,
-            2
-          ],
-          [
-            12,
-            2,
-            7
-          ],
-          [
-            13,
-            2,
-            1
-          ],
-          [
-            14,
-            2,
-            8
-          ],
-          [
-            15,
-            2,
-            7
-          ],
-          [
-            16,
-            2,
-            6
-          ],
-          [
-            17,
-            2,
-            6
-          ],
-          [
-            18,
-            2,
-            5
-          ],
-          [
-            19,
-            2,
-            0
-          ],
-          [
-            20,
-            2,
-            1
-          ],
-          [
-            21,
-            2,
-            0
-          ],
-          [
-            22,
-            2,
-            1
-          ],
-          [
-            23,
-            2,
-            0
-          ],
-          [
-            0,
-            3,
-            0
-          ],
-          [
-            1,
-            3,
-            0
-          ],
-          [
-            2,
-            3,
-            0
-          ],
-          [
-            3,
-            3,
-            0
-          ],
-          [
-            4,
-            3,
-            0
-          ],
-          [
-            5,
-            3,
-            0
-          ],
-          [
-            6,
-            3,
-            1
-          ],
-          [
-            7,
-            3,
-            0
-          ],
-          [
-            8,
-            3,
-            3
-          ],
-          [
-            9,
-            3,
-            6
-          ],
-          [
-            10,
-            3,
-            8
-          ],
-          [
-            11,
-            3,
-            1
-          ],
-          [
-            12,
-            3,
-            3
-          ],
-          [
-            13,
-            3,
-            8
-          ],
-          [
-            14,
-            3,
-            0
-          ],
-          [
-            15,
-            3,
-            1
-          ],
-          [
-            16,
-            3,
-            4
-          ],
-          [
-            17,
-            3,
-            0
-          ],
-          [
-            18,
-            3,
-            6
-          ],
-          [
-            19,
-            3,
-            1
-          ],
-          [
-            20,
-            3,
-            0
-          ],
-          [
-            21,
-            3,
-            0
-          ],
-          [
-            22,
-            3,
-            1
-          ],
-          [
-            23,
-            3,
-            0
-          ],
-          [
-            0,
-            4,
-            0
-          ],
-          [
-            1,
-            4,
-            0
-          ],
-          [
-            2,
-            4,
-            0
-          ],
-          [
-            3,
-            4,
-            0
-          ],
-          [
-            4,
-            4,
-            0
-          ],
-          [
-            5,
-            4,
-            0
-          ],
-          [
-            6,
-            4,
-            0
-          ],
-          [
-            7,
-            4,
-            0
-          ],
-          [
-            8,
-            4,
-            3
-          ],
-          [
-            9,
-            4,
-            6
-          ],
-          [
-            10,
-            4,
-            9
-          ],
-          [
-            11,
-            4,
-            5
-          ],
-          [
-            12,
-            4,
-            5
-          ],
-          [
-            13,
-            4,
-            7
-          ],
-          [
-            14,
-            4,
-            6
-          ],
-          [
-            15,
-            4,
-            7
-          ],
-          [
-            16,
-            4,
-            5
-          ],
-          [
-            17,
-            4,
-            1
-          ],
-          [
-            18,
-            4,
-            0
-          ],
-          [
-            19,
-            4,
-            0
-          ],
-          [
-            20,
-            4,
-            0
-          ],
-          [
-            21,
-            4,
-            0
-          ],
-          [
-            22,
-            4,
-            0
-          ],
-          [
-            23,
-            4,
-            0
-          ],
-          [
-            0,
-            5,
-            0
-          ],
-          [
-            1,
-            5,
-            0
-          ],
-          [
-            2,
-            5,
-            0
-          ],
-          [
-            3,
-            5,
-            0
-          ],
-          [
-            4,
-            5,
-            1
-          ],
-          [
-            5,
-            5,
-            0
-          ],
-          [
-            6,
-            5,
-            0
-          ],
-          [
-            7,
-            5,
-            0
-          ],
-          [
-            8,
-            5,
-            0
-          ],
-          [
-            9,
-            5,
-            0
-          ],
-          [
-            10,
-            5,
-            0
-          ],
-          [
-            11,
-            5,
-            0
-          ],
-          [
-            12,
-            5,
-            1
-          ],
-          [
-            13,
-            5,
-            0
-          ],
-          [
-            14,
-            5,
-            0
-          ],
-          [
-            15,
-            5,
-            0
-          ],
-          [
-            16,
-            5,
-            1
-          ],
-          [
-            17,
-            5,
-            0
-          ],
-          [
-            18,
-            5,
-            0
-          ],
-          [
-            19,
-            5,
-            1
-          ],
-          [
-            20,
-            5,
-            1
-          ],
-          [
-            21,
-            5,
-            0
-          ],
-          [
-            22,
-            5,
-            0
-          ],
-          [
-            23,
-            5,
-            0
-          ],
-          [
-            0,
-            6,
-            0
-          ],
-          [
-            1,
-            6,
-            1
-          ],
-          [
-            2,
-            6,
-            1
-          ],
-          [
-            3,
-            6,
-            0
-          ],
-          [
-            4,
-            6,
-            0
-          ],
-          [
-            5,
-            6,
-            0
-          ],
-          [
-            6,
-            6,
-            1
-          ],
-          [
-            7,
-            6,
-            1
-          ],
-          [
-            8,
-            6,
-            1
-          ],
-          [
-            9,
-            6,
-            0
-          ],
-          [
-            10,
-            6,
-            0
-          ],
-          [
-            11,
-            6,
-            0
-          ],
-          [
-            12,
-            6,
-            0
-          ],
-          [
-            13,
-            6,
-            0
-          ],
-          [
-            14,
-            6,
-            0
-          ],
-          [
-            15,
-            6,
-            0
-          ],
-          [
-            16,
-            6,
-            0
-          ],
-          [
-            17,
-            6,
-            0
-          ],
-          [
-            18,
-            6,
-            0
-          ],
-          [
-            19,
-            6,
-            0
-          ],
-          [
-            20,
-            6,
-            0
-          ],
-          [
-            21,
-            6,
-            0
-          ],
-          [
-            22,
-            6,
-            0
-          ],
-          [
-            23,
-            6,
-            0
-          ]
-        ]
-      }
+     "date": "2026-09-21",
+     "weekday": "seg",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
     },
     {
-      "type": "table",
-      "title": "Principais erros",
-      "description": "Agrupados por mensagem; ids para abrir no Jaylog.",
-      "columns": [
-        {
-          "key": "level",
-          "label": "Nível",
-          "format": "status"
-        },
-        {
-          "key": "message",
-          "label": "Mensagem",
-          "format": "code"
-        },
-        {
-          "key": "count",
-          "label": "Ocorrências",
-          "numeric": true
-        },
-        {
-          "key": "last",
-          "label": "Última",
-          "format": "date"
-        },
-        {
-          "key": "log",
-          "label": "Log",
-          "format": "code"
-        }
-      ],
-      "rows": [
-        {
-          "level": "critical",
-          "message": "KeyError: cnpj em importar_notas()",
-          "count": 312,
-          "last": "2026-11-03T22:41",
-          "log": "0190a1b2-c3d4-7e5f"
-        },
-        {
-          "level": "serious",
-          "message": "TimeoutError: SAP não respondeu em 30s",
-          "count": 140,
-          "last": "2026-11-03T19:02",
-          "log": "0190a1b2-c3d4-7e60"
-        },
-        {
-          "level": "warning",
-          "message": "</script><img src=x onerror=alert(1)> payload de teste",
-          "count": 3,
-          "last": "2026-11-01T10:00",
-          "log": "0190a1b2-c3d4-7e61"
-        }
-      ]
+     "date": "2026-09-21",
+     "weekday": "seg",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
     },
     {
-      "type": "text",
-      "title": "Leitura",
-      "paragraphs": [
-        "Os erros se concentram na VM01 em horário comercial e cresceram junto com a memória do processo."
-      ],
-      "bullets": [
-        "Investigar o KeyError cnpj (312 ocorrências).",
-        "Liberar espaço em disco na VM01 (91%)."
-      ]
+     "date": "2026-09-21",
+     "weekday": "seg",
+     "hour": "20h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-22",
+     "weekday": "ter",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-09-22",
+     "weekday": "ter",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-22",
+     "weekday": "ter",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-22",
+     "weekday": "ter",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-22",
+     "weekday": "ter",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-09-22",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-22",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-23",
+     "weekday": "qua",
+     "hour": "06h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-23",
+     "weekday": "qua",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-23",
+     "weekday": "qua",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-09-23",
+     "weekday": "qua",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-23",
+     "weekday": "qua",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-23",
+     "weekday": "qua",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-23",
+     "weekday": "qua",
+     "hour": "21h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-24",
+     "weekday": "qui",
+     "hour": "03h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-24",
+     "weekday": "qui",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-25",
+     "weekday": "sex",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-25",
+     "weekday": "sex",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-25",
+     "weekday": "sex",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-25",
+     "weekday": "sex",
+     "hour": "19h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-26",
+     "weekday": "sáb",
+     "hour": "06h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-26",
+     "weekday": "sáb",
+     "hour": "07h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-26",
+     "weekday": "sáb",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-26",
+     "weekday": "sáb",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-26",
+     "weekday": "sáb",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-27",
+     "weekday": "dom",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-27",
+     "weekday": "dom",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-27",
+     "weekday": "dom",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-27",
+     "weekday": "dom",
+     "hour": "23h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 2
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 2
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-28",
+     "weekday": "seg",
+     "hour": "20h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "02h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "19h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-29",
+     "weekday": "ter",
+     "hour": "21h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-30",
+     "weekday": "qua",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-09-30",
+     "weekday": "qua",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-09-30",
+     "weekday": "qua",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-09-30",
+     "weekday": "qua",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-09-30",
+     "weekday": "qua",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-09-30",
+     "weekday": "qua",
+     "hour": "23h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-01",
+     "weekday": "qui",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-01",
+     "weekday": "qui",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-01",
+     "weekday": "qui",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-02",
+     "weekday": "sex",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-10-02",
+     "weekday": "sex",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-03",
+     "weekday": "sáb",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-04",
+     "weekday": "dom",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-04",
+     "weekday": "dom",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-04",
+     "weekday": "dom",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "04h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "07h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-05",
+     "weekday": "seg",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 3
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 2
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-06",
+     "weekday": "ter",
+     "hour": "19h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "06h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 3
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 5
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-07",
+     "weekday": "qua",
+     "hour": "21h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-08",
+     "weekday": "qui",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-08",
+     "weekday": "qui",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-09",
+     "weekday": "sex",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-09",
+     "weekday": "sex",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-09",
+     "weekday": "sex",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-09",
+     "weekday": "sex",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-09",
+     "weekday": "sex",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-10",
+     "weekday": "sáb",
+     "hour": "20h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-11",
+     "weekday": "dom",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-11",
+     "weekday": "dom",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "07h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-12",
+     "weekday": "seg",
+     "hour": "20h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "21h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-13",
+     "weekday": "ter",
+     "hour": "23h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-14",
+     "weekday": "qua",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-14",
+     "weekday": "qua",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-14",
+     "weekday": "qua",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-14",
+     "weekday": "qua",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-14",
+     "weekday": "qua",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-14",
+     "weekday": "qua",
+     "hour": "22h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "06h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "19h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "20h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-15",
+     "weekday": "qui",
+     "hour": "23h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-16",
+     "weekday": "sex",
+     "hour": "06h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-16",
+     "weekday": "sex",
+     "hour": "06h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-16",
+     "weekday": "sex",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-16",
+     "weekday": "sex",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-16",
+     "weekday": "sex",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-16",
+     "weekday": "sex",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-16",
+     "weekday": "sex",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-17",
+     "weekday": "sáb",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-17",
+     "weekday": "sáb",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-17",
+     "weekday": "sáb",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-17",
+     "weekday": "sáb",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-18",
+     "weekday": "dom",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-19",
+     "weekday": "seg",
+     "hour": "06h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 3
+    },
+    {
+     "date": "2026-10-19",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 3
+    },
+    {
+     "date": "2026-10-19",
+     "weekday": "seg",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-19",
+     "weekday": "seg",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-19",
+     "weekday": "seg",
+     "hour": "20h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-20",
+     "weekday": "ter",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-20",
+     "weekday": "ter",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-20",
+     "weekday": "ter",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-20",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-21",
+     "weekday": "qua",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-21",
+     "weekday": "qua",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-21",
+     "weekday": "qua",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-21",
+     "weekday": "qua",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-21",
+     "weekday": "qua",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-21",
+     "weekday": "qua",
+     "hour": "19h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-21",
+     "weekday": "qua",
+     "hour": "22h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "21h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-22",
+     "weekday": "qui",
+     "hour": "22h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-23",
+     "weekday": "sex",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "07h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-24",
+     "weekday": "sáb",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-25",
+     "weekday": "dom",
+     "hour": "03h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-25",
+     "weekday": "dom",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "06h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 3
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "19h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-26",
+     "weekday": "seg",
+     "hour": "21h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-27",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 2
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "19h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "20h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "20h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-28",
+     "weekday": "qua",
+     "hour": "20h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "05h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-29",
+     "weekday": "qui",
+     "hour": "19h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "00h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "02h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "06h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "06h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "07h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "11h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "11h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "12h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 2
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "17h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "19h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-30",
+     "weekday": "sex",
+     "hour": "19h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "01h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "04h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "05h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "12h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ConnectionResetError: SAP fechou a conexão",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "13h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-10-31",
+     "weekday": "sáb",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-11-01",
+     "weekday": "dom",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-11-01",
+     "weekday": "dom",
+     "hour": "10h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "</script><img src=x onerror=alert(1)> payload de teste",
+     "count": 3
+    },
+    {
+     "date": "2026-11-01",
+     "weekday": "dom",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-11-01",
+     "weekday": "dom",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-11-01",
+     "weekday": "dom",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "06h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "06h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "08h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 3
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "14h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "15h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "ValueError: data de emissão inválida (00/00/0000)",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "16h",
+     "instance": "VM02 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "16h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 2
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "20h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "21h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "21h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-11-02",
+     "weekday": "seg",
+     "hour": "23h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "06h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "07h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "09h",
+     "instance": "VM01 · bot",
+     "level": "ERROR",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "09h",
+     "instance": "VM02 · bot",
+     "level": "ERROR",
+     "error": "PermissionError: pasta \\\\srv01\\notas bloqueada",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "10h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "13h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "14h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "15h",
+     "instance": "VM01 · bot",
+     "level": "CRITICAL",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "17h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "18h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "count": 1
+    },
+    {
+     "date": "2026-11-03",
+     "weekday": "ter",
+     "hour": "19h",
+     "instance": "VM01 · bot",
+     "level": "EXCEPTION",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "count": 1
     }
-  ]
+   ]
+  }
+ },
+ "filters": [
+  {
+   "field": "date",
+   "kind": "date-range",
+   "label": "Período"
+  },
+  {
+   "field": "instance",
+   "label": "Instância"
+  },
+  {
+   "field": "level",
+   "label": "Nível"
+  },
+  {
+   "field": "error",
+   "label": "Erro"
+  }
+ ],
+ "events": [
+  {
+   "at": "2026-10-21T15:00",
+   "label": "Deploy v2.3",
+   "status": "info"
+  }
+ ],
+ "details": {
+  "error": {
+   "KeyError: 'cnpj' em importar_notas()": {
+    "text": "Começou a subir no dia do deploy v2.3, quando o layout da nota passou a vir sem a chave \"cnpj\" para notas de serviço.",
+    "samples": [
+     "KeyError: 'cnpj'\n  File \"importar_notas.py\", line 212, in importar_notas\n    doc = nota['cnpj']"
+    ],
+    "links": [
+     {
+      "label": "Abrir no Jaylog",
+      "url": "https://jaylog.example.com/logs?q=cnpj"
+     }
+    ]
+   },
+   "TimeoutError: SAP não respondeu em 30s": {
+    "text": "Aparece em rajadas nos mesmos dias que o ConnectionResetError: os dois apontam para instabilidade do SAP, não do robô."
+   }
+  },
+  "instance": {
+   "VM01 · bot": {
+    "facts": [
+     {
+      "label": "CPU agora",
+      "value": 95,
+      "unit": "%"
+     },
+     {
+      "label": "Disco",
+      "value": 91,
+      "unit": "%"
+     },
+     {
+      "label": "Versão",
+      "value": "v2.3.1"
+     }
+    ]
+   },
+   "VM02 · bot": {
+    "facts": [
+     {
+      "label": "CPU agora",
+      "value": 38,
+      "unit": "%"
+     },
+     {
+      "label": "Disco",
+      "value": 64,
+      "unit": "%"
+     },
+     {
+      "label": "Versão",
+      "value": "v2.3.1"
+     }
+    ]
+   }
+  }
+ },
+ "sections": [
+  {
+   "type": "kpis",
+   "items": [
+    {
+     "label": "Erros no período",
+     "query": {
+      "dataset": "erros"
+     },
+     "hint": "ERROR + EXCEPTION + CRITICAL",
+     "status": "critical",
+     "status_label": "Subindo desde 21/10",
+     "target": "erros-por-dia"
+    },
+    {
+     "label": "Críticos",
+     "query": {
+      "dataset": "erros",
+      "where": {
+       "level": "CRITICAL"
+      }
+     },
+     "filter": {
+      "level": "CRITICAL"
+     },
+     "target": "erros-por-dia"
+    },
+    {
+     "label": "Instâncias com erro",
+     "query": {
+      "dataset": "erros",
+      "agg": "distinct",
+      "value": "instance"
+     },
+     "unit": "de 3"
+    },
+    {
+     "label": "Tipos de erro",
+     "query": {
+      "dataset": "erros",
+      "agg": "distinct",
+      "value": "error"
+     },
+     "target": "principais-erros"
+    },
+    {
+     "label": "Disco da VM01",
+     "value": 91,
+     "unit": "%",
+     "status": "warning",
+     "status_label": "Acima de 90%",
+     "target": "recursos"
+    }
+   ]
+  },
+  {
+   "type": "alerts",
+   "title": "Alertas",
+   "items": [
+    {
+     "severity": "critical",
+     "title": "CPU da VM01 em 95% agora",
+     "detail": "Média de 64% nas últimas 2 h; a VM01 roda também o Bot Cadastro.",
+     "filter": {
+      "instance": "VM01 · bot"
+     },
+     "target": "recursos"
+    },
+    {
+     "severity": "critical",
+     "title": "KeyError 'cnpj' 6× mais frequente desde o deploy v2.3",
+     "detail": "De ~1 por dia para ~7 por dia a partir de 21/10, quase tudo na VM01.",
+     "filter": {
+      "error": "KeyError: 'cnpj' em importar_notas()"
+     },
+     "target": "erros-por-dia"
+    },
+    {
+     "severity": "warning",
+     "title": "Memória do processo cresceu 144% em 2 h",
+     "detail": "Padrão de vazamento: 270 MB → 660 MB sem queda. O MemoryError do PDF acompanha.",
+     "filter": {
+      "error": "MemoryError ao gerar o PDF do lote"
+     },
+     "target": "correlacao"
+    },
+    {
+     "severity": "info",
+     "title": "VM02 sem amostras há 1 h",
+     "detail": "Última atividade às 22:44; confira se a execução terminou normalmente."
+    }
+   ]
+  },
+  {
+   "type": "chart",
+   "id": "erros-por-dia",
+   "title": "Erros por dia e nível",
+   "description": "Agregado do list-logs. A linha tracejada marca o deploy v2.3; o volume sobe a partir dele.",
+   "chart": {
+    "kind": "bar",
+    "stacked": true,
+    "palette": "severity",
+    "dates": true,
+    "query": {
+     "dataset": "erros",
+     "x": "date",
+     "series": "level"
+    }
+   }
+  },
+  {
+   "type": "chart",
+   "title": "Erros por instância",
+   "description": "Soma de todos os níveis por host · usuário. A VM03 não teve erro no período.",
+   "chart": {
+    "kind": "bar",
+    "horizontal": true,
+    "height": 180,
+    "query": {
+     "dataset": "erros",
+     "x": "instance",
+     "series_name": "Erros"
+    }
+   }
+  },
+  {
+   "type": "chart",
+   "id": "correlacao",
+   "title": "Quais erros variam juntos",
+   "description": "Correlação entre as contagens diárias de cada erro (Pearson). Azul: sobem e descem juntos; âmbar: um sobe quando o outro desce.",
+   "chart": {
+    "kind": "correlation",
+    "query": {
+     "dataset": "erros",
+     "field": "error",
+     "bucket": "date",
+     "limit": 7
+    }
+   }
+  },
+  {
+   "type": "chart",
+   "title": "Mapa de relações: instâncias e erros",
+   "description": "Linhas cheias: onde cada erro acontece (espessura = volume). Tracejadas: erros que variam juntos no tempo (r ≥ 0,5).",
+   "chart": {
+    "kind": "graph",
+    "query": {
+     "dataset": "erros",
+     "fields": [
+      "instance",
+      "error"
+     ],
+     "correlate": "error",
+     "min_r": 0.5
+    }
+   }
+  },
+  {
+   "type": "chart",
+   "title": "Caminho dos erros: instância → nível → mensagem",
+   "description": "A largura de cada faixa é o número de erros.",
+   "chart": {
+    "kind": "sankey",
+    "query": {
+     "dataset": "erros",
+     "fields": [
+      "instance",
+      "level",
+      "error"
+     ],
+     "limit": 6
+    }
+   }
+  },
+  {
+   "type": "chart",
+   "title": "Erros por dia da semana e hora",
+   "description": "Horário de Brasília (UTC−3). Concentração no horário comercial; o PermissionError aparece às segundas de manhã.",
+   "chart": {
+    "kind": "heatmap",
+    "query": {
+     "dataset": "erros",
+     "x": "hour",
+     "y": "weekday",
+     "x_order": [
+      "00h",
+      "01h",
+      "02h",
+      "03h",
+      "04h",
+      "05h",
+      "06h",
+      "07h",
+      "08h",
+      "09h",
+      "10h",
+      "11h",
+      "12h",
+      "13h",
+      "14h",
+      "15h",
+      "16h",
+      "17h",
+      "18h",
+      "19h",
+      "20h",
+      "21h",
+      "22h",
+      "23h"
+     ],
+     "y_order": [
+      "seg",
+      "ter",
+      "qua",
+      "qui",
+      "sex",
+      "sáb",
+      "dom"
+     ]
+    }
+   }
+  },
+  {
+   "type": "chart",
+   "title": "Uso de recursos — VM01 (últimas 48 h)",
+   "description": "Médias por hora (get-host-metrics). Linhas tracejadas: limites de atenção e crítico.",
+   "chart": {
+    "kind": "line",
+    "dates": true,
+    "x": [
+     "2026-11-03T00:00",
+     "2026-11-03T01:00",
+     "2026-11-03T02:00",
+     "2026-11-03T03:00",
+     "2026-11-03T04:00",
+     "2026-11-03T05:00",
+     "2026-11-03T06:00",
+     "2026-11-03T07:00",
+     "2026-11-03T08:00",
+     "2026-11-03T09:00",
+     "2026-11-03T10:00",
+     "2026-11-03T11:00",
+     "2026-11-03T12:00",
+     "2026-11-03T13:00",
+     "2026-11-03T14:00",
+     "2026-11-03T15:00",
+     "2026-11-03T16:00",
+     "2026-11-03T17:00",
+     "2026-11-03T18:00",
+     "2026-11-03T19:00",
+     "2026-11-03T20:00",
+     "2026-11-03T21:00",
+     "2026-11-03T22:00",
+     "2026-11-03T23:00",
+     "2026-11-04T00:00",
+     "2026-11-04T01:00",
+     "2026-11-04T02:00",
+     "2026-11-04T03:00",
+     "2026-11-04T04:00",
+     "2026-11-04T05:00",
+     "2026-11-04T06:00",
+     "2026-11-04T07:00",
+     "2026-11-04T08:00",
+     "2026-11-04T09:00",
+     "2026-11-04T10:00",
+     "2026-11-04T11:00",
+     "2026-11-04T12:00",
+     "2026-11-04T13:00",
+     "2026-11-04T14:00",
+     "2026-11-04T15:00",
+     "2026-11-04T16:00",
+     "2026-11-04T17:00",
+     "2026-11-04T18:00",
+     "2026-11-04T19:00",
+     "2026-11-04T20:00",
+     "2026-11-04T21:00",
+     "2026-11-04T22:00",
+     "2026-11-04T23:00"
+    ],
+    "unit": "%",
+    "y_min": 0,
+    "y_max": 100,
+    "thresholds": [
+     {
+      "value": 80,
+      "status": "warning",
+      "label": "Atenção"
+     },
+     {
+      "value": 90,
+      "status": "critical",
+      "label": "Crítico"
+     }
+    ],
+    "series": [
+     {
+      "name": "CPU da máquina",
+      "values": [
+       40.6,
+       45.7,
+       48.6,
+       48.9,
+       52.7,
+       61.3,
+       56,
+       60.2,
+       60.3,
+       50.9,
+       54,
+       49.5,
+       45.8,
+       40.5,
+       34.1,
+       26.9,
+       21.8,
+       22.9,
+       22.5,
+       18.2,
+       17.7,
+       21.1,
+       28,
+       29.3,
+       32.2,
+       39.3,
+       45.2,
+       46.7,
+       53.9,
+       54.8,
+       55.3,
+       57.4,
+       62.7,
+       61.4,
+       56,
+       54.5,
+       50.6,
+       40.1,
+       38.7,
+       29.7,
+       28.1,
+       59.8,
+       58.6,
+       58.2,
+       53.9,
+       52.1,
+       56.1,
+       56.8
+      ]
+     },
+     {
+      "name": "Memória da máquina",
+      "values": [
+       50,
+       50.2,
+       50.9,
+       51.3,
+       52.7,
+       52.1,
+       53.9,
+       52.3,
+       53.7,
+       55,
+       54.6,
+       56.8,
+       56.1,
+       56.5,
+       58.4,
+       58.3,
+       57.8,
+       60.5,
+       61.3,
+       62.1,
+       62.7,
+       62.6,
+       64.1,
+       61.9,
+       64.7,
+       64.8,
+       65.8,
+       66.9,
+       64.9,
+       65.8,
+       66.2,
+       66.9,
+       67.5,
+       67.8,
+       70.2,
+       71.8,
+       70.2,
+       70.6,
+       71.4,
+       73.4,
+       72.7,
+       74,
+       76.2,
+       75.1,
+       76.4,
+       77.3,
+       76.8,
+       77.4
+      ]
+     },
+     {
+      "name": "Disco",
+      "values": [
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91,
+       91
+      ]
+     }
+    ]
+   },
+   "id": "recursos"
+  },
+  {
+   "type": "table",
+   "id": "principais-erros",
+   "title": "Principais erros",
+   "description": "Agrupados por mensagem (ids e números removidos).",
+   "query": {
+    "dataset": "erros",
+    "group_by": [
+     "error",
+     "level"
+    ],
+    "measures": {
+     "count": "sum:count",
+     "instances": "distinct:instance",
+     "last": "max:date"
+    },
+    "sort": "count"
+   },
+   "columns": [
+    {
+     "key": "level",
+     "label": "Nível",
+     "format": "level"
+    },
+    {
+     "key": "error",
+     "label": "Mensagem",
+     "format": "code"
+    },
+    {
+     "key": "count",
+     "label": "Ocorrências",
+     "numeric": true
+    },
+    {
+     "key": "instances",
+     "label": "Instâncias",
+     "numeric": true
+    },
+    {
+     "key": "last",
+     "label": "Último dia",
+     "format": "date"
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "title": "Issues abertas",
+   "description": "list-issues. Clique numa issue para ver o erro ligado a ela.",
+   "filter_field": "error",
+   "columns": [
+    {
+     "key": "id",
+     "label": "Issue",
+     "format": "code"
+    },
+    {
+     "key": "title",
+     "label": "Título"
+    },
+    {
+     "key": "error",
+     "label": "Erro relacionado",
+     "format": "code"
+    },
+    {
+     "key": "status",
+     "label": "Status",
+     "format": "status"
+    }
+   ],
+   "rows": [
+    {
+     "id": "#128",
+     "title": "Notas de serviço sem CNPJ após v2.3",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "status": "critical"
+    },
+    {
+     "id": "#131",
+     "title": "Lentidão do SAP no fechamento",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "status": "warning"
+    },
+    {
+     "id": "#119",
+     "title": "Vazamento de memória na geração de PDF",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "status": "warning"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "title": "Leitura",
+   "paragraphs": [
+    "Fato: o KeyError 'cnpj' explica a maior parte da alta desde 21/10, dia do deploy v2.3, e acontece quase só na VM01. TimeoutError e ConnectionResetError sobem juntos nos mesmos dias (r alto), o que aponta para o SAP e não para o robô.",
+    "Hipótese: o MemoryError do PDF, que cresce a partir de 28/10, está ligado ao vazamento de memória visto nas últimas 48 h da VM01."
+   ],
+   "bullets": [
+    "Corrigir o tratamento de notas sem 'cnpj' (issue #128).",
+    "Abrir chamado com o time do SAP com os dias de rajada de timeout.",
+    "Liberar espaço em disco na VM01 (91%)."
+   ]
+  }
+ ]
 }

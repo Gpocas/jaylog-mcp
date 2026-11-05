@@ -58,6 +58,31 @@ nunca só pela cor, e nunca é usado como cor de série.
 
 Do azul quase branco ao azul profundo: claro `#e4e8f6` → `#2b3a78`, escuro `#20263d` → `#9fb0ec`.
 
+## Divergente (matriz de correlação)
+
+Âmbar (OTel) ↔ meio neutro ↔ azul (OTel), para r de −1 a +1. Os polos são as pontas escuras dos dois
+tons da marca; o meio é o cinza neutro da `dataviz`, que lê como "nada".
+
+| Ponto | Claro | Escuro |
+|---|---|---|
+| −1 (opostos) | `#9a6a00` | `#c28408` |
+| 0 | `#f0efec` | `#383835` |
+| +1 (juntos) | `#2b3a78` (= ponta do sequencial) | `#9fb0ec` (= ponta do sequencial) |
+
+Validação: entre os dois polos, CVD ΔE 25,8 no claro e 24,1 no escuro, e visão normal ΔE 29,2 e
+24,7. Os polos ficam fora da faixa de luminosidade das séries categóricas, o que é esperado: são
+pontas de rampa, não cores de série. O meio tem contraste baixo com a superfície de propósito
+(r ≈ 0 deve sumir); por isso cada célula traz o valor de r escrito e o "Ver dados" lista os pares.
+O vermelho fica de fora para não ser lido como gravidade.
+
+## Interação
+
+- Seleção: categorias não selecionadas ficam com opacidade 0,22, e a selecionada mantém a cor. O
+  destaque nunca troca a cor da entidade.
+- Seleção em heatmap, grafo e sankey: contorno na cor do texto (`--ink`), 2 a 3 px.
+- Ligações de correlação no grafo: tracejado na cor da marca. Ligações de volume: cinza do eixo.
+- "Outros" usa o cinza `--muted`, nunca um slot da paleta.
+
 ## Revalidar depois de mudar uma cor
 
 Com a skill `dataviz` carregada (o caminho do validador aparece no diretório base dela):
@@ -67,4 +92,7 @@ node <dataviz>/scripts/validate_palette.js "#4f61ab,#d38f01,#e87ba4,#008300,#625
 node <dataviz>/scripts/validate_palette.js "#677bc7,#c28408,#d55181,#008300,#9085e9,#199e70" --mode dark --surface "#1a1a19"
 node <dataviz>/scripts/validate_palette.js "#ff7e76,#d23d3d,#9e0116" --ordinal --mode light
 node <dataviz>/scripts/validate_palette.js "#b61d25,#ef5854,#ff7e76" --ordinal --mode dark --surface "#1a1a19"
+# divergente: confira a separação entre os polos (CVD e visão normal)
+node <dataviz>/scripts/validate_palette.js "#9a6a00,#2b3a78" --mode light
+node <dataviz>/scripts/validate_palette.js "#c28408,#9fb0ec" --mode dark --surface "#1a1a19"
 ```
