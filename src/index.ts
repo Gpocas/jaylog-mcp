@@ -6,6 +6,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { login } from './auth/login'
 import { logout } from './auth/logout'
 import { colors } from './cli/colors'
+import { runDataset } from './cli/dataset'
 import { registerErrorSummaryTools } from './tools/errorSummary'
 import { registerIssueTools } from './tools/issues'
 import { registerKeyUserTools } from './tools/keyUsers'
@@ -43,6 +44,7 @@ async function main() {
 
   if (command === 'login') return login()
   if (command === 'logout') return logout()
+  if (command === 'dataset') return runDataset(process.argv.slice(3))
 
   return runServer()
 }

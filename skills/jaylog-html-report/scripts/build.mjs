@@ -30,10 +30,41 @@ const isoDay = v => /^\d{4}-\d{2}-\d{2}/.test(String(v))
 
 // ---------- datasets ----------
 const datasets = {}
+let specDir = '.'
+
+// `from_file`: dataset gerado por `jaylog-mcp dataset`. As linhas entram no HTML; os campos do
+// spec têm prioridade sobre os do arquivo, e os `details` do arquivo completam os do spec.
+const FILE_FIELDS = ['rows', 'value', 'unit', 'time', 'time_range', 'dimensions', 'label']
+function loadDatasetFile(spec, name, d) {
+  const p = `datasets.${name}.from_file`
+  if (!isStr(d.from_file)) { fail(p, 'caminho do arquivo .dataset.json'); return d }
+  const path = resolve(specDir, d.from_file)
+  let file
+  try { file = JSON.parse(readFileSync(path, 'utf8')) } catch (e) { fail(p, `não consegui ler ${path}: ${e.message}`); return d }
+  if (!isObj(file) || !isArr(file.rows)) { fail(p, `${path} não é um dataset (falta "rows"); gere com "jaylog-mcp dataset"`); return d }
+  const merged = {}
+  for (const k of FILE_FIELDS) if (file[k] !== undefined) merged[k] = file[k]
+  for (const [k, v] of Object.entries(d)) if (k !== 'from_file') merged[k] = v
+  if (isObj(file.details)) {
+    spec.details ??= {}
+    for (const [field, values] of Object.entries(file.details)) {
+      if (!isObj(values)) continue
+      spec.details[field] ??= {}
+      for (const [value, info] of Object.entries(values)) spec.details[field][value] = { ...info, ...(spec.details[field][value] ?? {}) }
+    }
+  }
+  if (file.coverage?.partial)
+    warnings.push(`datasets.${name}: cobertura parcial (${Math.round((file.coverage.ratio ?? 0) * 100)}% do histórico; dias completos a partir de ${file.coverage.first_complete_day ?? '?'}). Diga isso na descrição dos gráficos`)
+  return merged
+}
 
 function checkDatasets(spec) {
   if (spec.datasets === undefined) return
   if (!isObj(spec.datasets)) return fail('datasets', 'objeto { "nome": { "rows": [...] } }')
+  for (const name of Object.keys(spec.datasets)) if (isObj(spec.datasets[name]) && spec.datasets[name].from_file !== undefined)
+    spec.datasets[name] = loadDatasetFile(spec, name, spec.datasets[name])
+  // Sem o arquivo, o resto da validação só repetiria o mesmo problema em cada seção.
+  if (errors.length) return false
   for (const [name, d] of Object.entries(spec.datasets)) {
     const p = `datasets.${name}`
     if (!isObj(d)) { fail(p, 'objeto com "rows"'); continue }
@@ -53,6 +84,8 @@ function checkDatasets(spec) {
       else if (!d.rows.slice(0, 200).every(r => r[d.time] === undefined || isoDay(r[d.time])))
         fail(`${p}.time`, `"${d.time}" deve ter datas ISO (2026-11-03 ou 2026-11-03T14:00)`)
     }
+    if (d.time_range !== undefined && !(isArr(d.time_range) && d.time_range.length === 2 && d.time_range.every(v => /^\d{4}-\d{2}-\d{2}$/.test(v)) && d.time_range[0] <= d.time_range[1]))
+      fail(`${p}.time_range`, '["AAAA-MM-DD", "AAAA-MM-DD"], início antes do fim')
     if (d.dimensions !== undefined && (!isArr(d.dimensions) || d.dimensions.some(f => !fields.has(f))))
       fail(`${p}.dimensions`, 'lista de campos existentes nas linhas')
     if (d.rows.length > 20000) warnings.push(`${p}: ${d.rows.length} linhas; agregue mais (por dia/hora) para o arquivo ficar leve`)
@@ -229,7 +262,7 @@ function checkFocus(path, item, ids) {
 function validate(spec) {
   if (!isObj(spec)) return fail('spec', 'o arquivo deve conter um objeto JSON')
   if (!isStr(spec.title)) fail('title', 'título obrigatório')
-  checkDatasets(spec)
+  if (checkDatasets(spec) === false) return
   const anyField = f => Object.values(datasets).some(d => d.fields.has(f))
 
   if (spec.filters !== undefined) {
@@ -383,6 +416,7 @@ try {
   process.exit(2)
 }
 
+specDir = dirname(resolve(specPath))
 validate(spec)
 if (errors.length) {
   console.error(`Spec inválida (${errors.length} problema(s)):`)

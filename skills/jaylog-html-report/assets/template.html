@@ -452,7 +452,7 @@ dialog.help[open] { animation: pop .2s ease-out; }
     var d = spec.datasets[name];
     var fields = {};
     (d.rows || []).slice(0, 1000).forEach(function (r) { Object.keys(r).forEach(function (k) { fields[k] = true; }); });
-    datasets[name] = { name: name, rows: d.rows || [], value: d.value, unit: d.unit || '', time: d.time,
+    datasets[name] = { name: name, rows: d.rows || [], value: d.value, unit: d.unit || '', time: d.time, timeRange: d.time_range,
       label: d.label || name, dimensions: d.dimensions || [], fields: fields, cache: {} };
   });
   var dsNames = Object.keys(datasets);
@@ -554,7 +554,13 @@ dialog.help[open] { animation: pop .2s ease-out; }
     var seen = {};
     ds.rows.forEach(function (r) { var v = r[field]; if (v !== null && v !== undefined && v !== '') seen[String(v)] = true; });
     var vals = Object.keys(seen).sort();
-    if (fill !== false && vals.length && vals.every(isDay)) vals = dayList(vals[0], vals[vals.length - 1]);
+    if (fill !== false && vals.every(isDay)) {
+      // O período declarado (time_range) vale mesmo nos dias sem nenhum registro nas pontas.
+      var r = field === ds.time && ds.timeRange;
+      var lo = r ? (vals.length && vals[0] < r[0] ? vals[0] : r[0]) : vals[0];
+      var hi = r ? (vals.length && vals[vals.length - 1] > r[1] ? vals[vals.length - 1] : r[1]) : vals[vals.length - 1];
+      if (lo && hi) vals = dayList(lo, hi);
+    }
     return (ds.cache[key] = vals);
   }
   function inRange(v) {

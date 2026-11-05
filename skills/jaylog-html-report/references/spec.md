@@ -67,6 +67,24 @@ hífen), usado por alertas, KPIs e marcos para levar o leitor até ela, e `tab`.
 }
 ```
 
+### Dataset em arquivo (`from_file`)
+
+```json
+"datasets": { "erros": { "from_file": "panorama-faturamento-2026-11-05.dataset.json" } }
+```
+
+Lê o arquivo gerado por `jaylog-mcp dataset` (caminho relativo ao spec) e põe as linhas dentro do
+HTML. Do arquivo vêm `rows`, `value`, `unit`, `time`, `time_range`, `dimensions` e `label`; qualquer
+um deles escrito no spec tem prioridade. Os `details` do arquivo (exemplos mascarados e
+primeira/última vez dos erros principais) completam os `details` do spec, que também têm prioridade.
+Com cobertura parcial, o build avisa.
+
+`time_range: ["AAAA-MM-DD", "AAAA-MM-DD"]` (também aceito em dataset escrito à mão) faz o eixo de
+dias e os atalhos de período cobrirem o período inteiro, mesmo com dias sem nenhum registro nas
+pontas.
+
+### Regras das linhas
+
 - Uma linha por combinação de dimensões, já **pré-agregada** (dia × hora × instância × nível ×
   mensagem → contagem). Não mande um log por linha: 45 dias cabem em poucos milhares de linhas.
 - `value`: campo numérico somado por padrão. Sem ele, cada linha conta 1.

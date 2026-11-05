@@ -74,35 +74,73 @@ Esses são pontos de partida. Tire as seções que não têm dado e acrescente o
 
 ## 2. Coletar os dados
 
-Faça em paralelo as chamadas que não dependem uma da outra. Para agregar muitos registros, escreva
-um script curto (Node ou Python) em vez de contar à mão. Conta de cabeça em centenas de linhas erra.
+Faça em paralelo as chamadas que não dependem uma da outra. Nunca conte à mão nem cole logs
+brutos no spec.
 
-### O dataset principal (o que deixa o relatório interativo)
+### O dataset principal: gere com `jaylog-mcp dataset`
 
-Para relatórios de erro, monte **um dataset** a partir do `list-logs` (filtre por `service` e
-`log_timestamp_from`/`to`, e por `log_level` se o volume for grande), agregando com um script:
+Para relatórios de erro, o dataset vem de um comando do próprio pacote do MCP. Ele busca os logs
+direto na API, com a mesma credencial do `login`, e escreve o arquivo pronto. Você **não lê nem copia
+as linhas**: só o resumo que ele imprime.
 
-- uma linha por **dia × hora × instância × nível × mensagem agrupada**, com a contagem em `count`;
-- `date` (`AAAA-MM-DD`), `hour` (`"14h"`) e `weekday` (`"seg"`…) **no fuso local** (diga o fuso na
-  `description` do heatmap);
-- `instance` como `host · usuário`; `level` em `ERROR`/`EXCEPTION`/`CRITICAL`;
-- `error` = mensagem agrupada: primeira linha da mensagem, com ids, números, datas, caminhos de
-  arquivo temporário e e-mails trocados por nada ou por um marcador, para que ocorrências do mesmo
-  erro caiam no mesmo grupo. Corte em ~90 caracteres.
-- Para comparativo de serviços, inclua `service` (nome) em vez de, ou além de, `instance`.
+```bash
+npx -y github:Gpocas/jaylog-mcp dataset --service <id> --days 45 \
+  --event "2026-10-21T15:00=Deploy v2.3" \
+  --out reports/panorama-<servico>-AAAA-MM-DD.dataset.json
+```
 
-Isso cabe em poucos milhares de linhas e alimenta KPIs, barras, heatmap, correlação, grafo, sankey,
-tabelas e o painel de detalhes de uma vez. Confira os totais do dataset com o `get-error-summary`:
-se o `list-logs` não trouxer tudo, diga na `description` que os gráficos cobrem só os logs obtidos.
+- `--service`: id (UUID) do serviço, que vem de `list-favorite-services`, `list-services` ou
+  `search-services-by-owner`. Para comparativo, passe vários ids separados por vírgula: as linhas
+  ganham o campo `service`.
+- `--days` (≤ 45) ou `--from`/`--to` (AAAA-MM-DD); `--tz` (padrão: o fuso da máquina);
+  `--levels` (padrão `CRITICAL,EXCEPTION,ERROR`; use `CRITICAL,EXCEPTION` se pediram só os graves).
+- `--event "data=rótulo"` (repetível): deploys e mudanças de versão (de `list-hosts` ou do que o
+  usuário contou). O resumo traz o antes e o depois de cada um.
+- Se o comando disser que `JAYLOG_URL` não está definida, use o mesmo valor da configuração do MCP
+  (`claude mcp get jaylog`, ou o `.mcp.json` do projeto) na frente do comando:
+  `JAYLOG_URL=<valor> npx …`. Se não autenticar, peça para rodar o `login`. Não invente a URL.
+
+O que o comando garante, igual em todo relatório:
+- uma linha por dia × hora × instância × nível × mensagem agrupada, com `date`, `hour` e `weekday`
+  no fuso escolhido e os dias sem erro dentro do período (`time_range`);
+- mensagens agrupadas pela primeira linha, com ids, números longos, datas, horas e caminhos
+  temporários trocados por marcadores, mais o tipo da exceção do traceback (`… · KeyError`);
+- **e-mail, CPF, CNPJ, tokens, senhas e JWT sempre mascarados**, nas linhas e nos exemplos;
+- `details.error` com 2 exemplos completos (mascarados) e primeira/última vez de cada erro
+  principal, que viram o painel de detalhes sozinhos;
+- busca em janelas que se dividem quando a resposta parece cortada pelo servidor, e conferência com
+  o histórico consolidado (`coverage`).
+
+No spec, aponte para o arquivo (o caminho é relativo ao spec) e use o `spec_snippet` impresso para
+`filters`, `labels` e `events`:
+
+```json
+"datasets": { "erros": { "from_file": "panorama-<servico>-AAAA-MM-DD.dataset.json" } }
+```
+
+**Escreva os textos a partir do resumo impresso** (`summary`), sem recontar:
+- `total`, `by_level`, `by_instance` (ou `by_service`) → KPIs e "Em resumo";
+- `trend` (média por dia dos últimos dias contra a de antes) e `events[].all_errors` /
+  `biggest_changes` → "subiu desde…", "5× mais frequente";
+- `top_errors` (volume, níveis, instâncias, primeiro/último dia, tendência) → alertas e tabelas;
+- `peak_days`, `hotspots_weekday_hour` e `correlated_errors` → o `help.read` dos gráficos de dias,
+  heatmap e correlação.
+
+**Cobertura.** O Jaylog guarda só os ~1000 logs mais recentes por instância. Se `coverage.partial`
+vier `true` (o build também avisa), diga na `description` dos gráficos e numa linha do resumo que
+os detalhes cobrem bem os dias a partir de `coverage.first_complete_day`. Para o total do período
+inteiro, use o `get-error-history` (por exemplo, num KPI estático).
+
+Se o comando não estiver disponível (MCP antigo, sem `npx`), monte o dataset com um script seguindo
+as mesmas regras acima, e mascare os dados sensíveis você mesmo.
 
 ### Dados que entram como seção estática
 
-- **`get-error-summary`** (`service`, `days` ≤ 45): total e erros por instância, para conferir o
-  dataset. Quando houver instância com `possibly_pruned: true`, escreva na `description` que os
-  números por instância cobrem só os logs mais recentes.
-- **`get-error-history`** (`service`, `from`/`to`): série diária por nível. Útil quando o volume é
-  grande demais para o `list-logs`; aí monte o dataset por dia × nível só com ela (sem instância e
-  mensagem), preenchendo com 0 os dias sem erro.
+- **`get-error-summary`** (`service`, `days` ≤ 45): total e erros por instância. O `coverage` do
+  dataset já faz a conferência; use esta tool quando precisar do total por instância do período
+  inteiro.
+- **`get-error-history`** (`service`, `from`/`to`): série diária por nível, completa nos 45 dias.
+  Útil para um gráfico estático do período inteiro quando a cobertura do dataset for parcial.
 - **`get-resource-usage`** (`service` ou `hostname`, `hours` ≤ 48): alertas prontos e a situação
   atual de cada instância. Os `alerts` viram itens da seção `alerts` (crítico para CPU/memória/disco
   no limite, atenção para crescimento de memória, info para falta de amostras); o resto vira tabela
@@ -142,8 +180,8 @@ completo de exemplo está em `assets/example-spec.json`. Regras que mantêm o re
 - **Todo gráfico com `help.read`.** É o "Como interpretar" do diálogo "Como ler": 2 a 4 frases
   simples com o que notar *neste* gráfico, citando datas, nomes e números que aparecem na tela
   ("Depois da linha tracejada (versão 2.3) as barras ficam bem mais altas"). O "o que mostra" e o
-  "como usar" o template gera sozinho; só sobrescreva se houver algo específico. Confira com um
-  script que os números citados batem com os dados.
+  "como usar" o template gera sozinho; só sobrescreva se houver algo específico. Tire os números
+  do `summary` do dataset; se precisar de outro recorte, calcule com um script sobre o arquivo.
 - **Escolha a forma pela pergunta:**
   - evolução contínua (CPU, memória) → `line`;
   - contagem por dia → `bar` com `dates`;
@@ -165,16 +203,16 @@ completo de exemplo está em `assets/example-spec.json`. Regras que mantêm o re
   `references/palette.md`. Não troque cores por relatório.
 - **Sem dado não é zero.** Use `null` em séries estáticas sem medição. Se uma seção inteira ficar
   sem dado, troque-a por uma seção `text` dizendo o que faltou, em vez de mostrar um gráfico vazio.
-- **Dados sensíveis.** Mensagens de log podem ter CPF, CNPJ, e-mails, tokens e senhas. Troque por
-  valores fictícios no mesmo formato antes de pôr no spec (inclusive em `details.samples`), porque o
-  HTML costuma ser repassado e o dataset inteiro vai dentro dele.
+- **Dados sensíveis.** Mensagens de log podem ter CPF, CNPJ, e-mails, tokens e senhas. O
+  `jaylog-mcp dataset` já mascara o dataset e os exemplos; tudo que **você** escrever no spec
+  (alertas, resumo, `details` extras) precisa do mesmo cuidado, porque o HTML costuma ser repassado.
 - **Termine com "O que fazer agora".** Uma seção `text` com 1 ou 2 parágrafos (`**Fato:**`,
   `**Hipótese:**`) e os próximos passos em `bullets`. Separe fato de hipótese.
 
 ## 4. Gerar
 
-Salve o spec e o HTML em `./reports/`, com o mesmo nome base. Assim o relatório pode ser
-regenerado depois de um ajuste:
+Salve o dataset, o spec e o HTML em `./reports/`, com o mesmo nome base (`.dataset.json`,
+`.spec.json`, `.html`). Assim o relatório pode ser regenerado depois de um ajuste:
 
 ```bash
 node <skill>/scripts/build.mjs reports/<nome>.spec.json reports/<nome>.html

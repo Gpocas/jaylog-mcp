@@ -136,6 +136,24 @@ npx -y github:Gpocas/jaylog-mcp login     # autentica (abre o navegador)
 npx -y github:Gpocas/jaylog-mcp logout    # remove a credencial local
 ```
 
+## Dataset para relatórios (`dataset`)
+
+Busca os erros de um ou mais serviços direto na API (com a mesma credencial do `login`) e grava o
+dataset agregado usado pela skill `jaylog-html-report`: uma linha por dia × hora × instância × nível
+× mensagem agrupada, no fuso local, com e-mails, CPF, CNPJ, tokens e senhas mascarados. Na saída
+padrão sai um resumo em JSON (totais, tendência, picos, principais erros, efeito de cada evento,
+erros correlacionados e a cobertura comparada com o histórico consolidado).
+
+```bash
+npx -y github:Gpocas/jaylog-mcp dataset --service <id> --days 45 \
+  --event "2026-10-21T15:00=Deploy v2.3" --out reports/panorama.dataset.json
+npx -y github:Gpocas/jaylog-mcp dataset --help   # todas as opções
+```
+
+A busca é feita em janelas de tempo que se dividem sozinhas quando a resposta parece cortada pelo
+servidor. Como o Jaylog guarda só os ~1000 logs brutos mais recentes por instância, o resumo traz
+`coverage`, que diz se algum dia ficou incompleto e a partir de quando os dados estão completos.
+
 ## Configuração
 
 | Variável | Descrição |
