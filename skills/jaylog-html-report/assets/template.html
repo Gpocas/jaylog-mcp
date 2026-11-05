@@ -737,7 +737,7 @@ dialog.help[open] { animation: pop .2s ease-out; }
     if (reduceMotion || typeof to !== 'number' || from === to) { write(to); return; }
     var start = performance.now(), dur = 700;
     (function step(now) {
-      var t = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - t, 3);
+      var t = Math.min(1, Math.max(0, (now - start) / dur)), e = 1 - Math.pow(1 - t, 3);
       write(from + (to - from) * e);
       if (t < 1) requestAnimationFrame(step);
     })(start);

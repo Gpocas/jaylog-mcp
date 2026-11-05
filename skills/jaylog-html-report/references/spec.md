@@ -15,7 +15,7 @@ O relatório tem duas abas. Cada seção vai para uma delas automaticamente, ou 
 | Aba | `tab` | Conteúdo | Para quem |
 |---|---|---|---|
 | **Visão geral** (abre primeiro) | `overview` (padrão de tudo que não é gráfico) | resumo, KPIs, alertas, marcos (`timeline`), tabelas e texto. **Sem gráficos e sem filtros**: os números são sempre do relatório inteiro | qualquer pessoa, inclusive leiga |
-| **Análise detalhada** | `analysis` (padrão de `chart`) | gráficos, barra de filtros, painel de detalhes | quem vai investigar |
+| **Análise detalhada** | `analysis` (padrão de `chart`) | barra lateral recolhível (resumo do recorte, 3 mais frequentes, filtros, visualização e legenda), gráficos, barra de status no rodapé e painel de detalhes | quem vai investigar |
 
 - Na visão geral, alertas, KPIs, marcos e linhas de tabela com `filter`/`target` levam para a
   análise já filtrada. Uma tabela com `filter_field` (ou `query`) faz o mesmo ao clicar numa linha.
@@ -42,7 +42,8 @@ O relatório tem duas abas. Cada seção vai para uma delas automaticamente, ou 
 | `source` | não | Tools usadas, para quem quiser refazer a consulta (rodapé) |
 | `generated_at` | não | ISO 8601; se omitido, o build usa a hora atual |
 | `datasets` | não | Registros para as seções com `query` (abaixo) |
-| `filters` | não | Controles da barra de filtros fixa no topo |
+| `filters` | não | Controles de filtro da barra lateral da análise |
+| `hotspots` | não | Campo exibido em "Mais frequentes" (top 3 do recorte) na barra lateral: `{ "field": "error", "dataset"?: "erros", "label"?: "Mais frequentes · Erro" }`. Padrão: `error` ou o primeiro filtro de valores |
 | `labels` | não | Nome legível de cada campo: `{ "instance": "Instância", "error": "Erro" }` |
 | `events` | não | Marcos verticais nos gráficos de tempo (deploy, incidente) |
 | `details` | não | Texto, fatos, exemplos e links extras do painel de detalhes |
@@ -166,19 +167,27 @@ Campos comuns a toda `query`:
 
 ```json
 { "type": "kpis", "items": [
-  { "label": "Erros no período", "query": { "dataset": "erros" }, "status": "critical", "status_label": "Subindo desde 21/10", "target": "erros-por-dia" },
-  { "label": "Críticos", "query": { "dataset": "erros", "where": { "level": "CRITICAL" } }, "filter": { "level": "CRITICAL" } },
-  { "label": "Instâncias com erro", "query": { "dataset": "erros", "agg": "distinct", "value": "instance" }, "unit": "de 3" },
-  { "label": "Disco da VM01", "value": 91, "unit": "%", "status": "warning", "status_label": "Acima de 90%", "target": "recursos" }
+  { "label": "Erros no período", "icon": "erros", "query": { "dataset": "erros" }, "trend": true, "status": "critical", "status_label": "Subindo desde 21/10", "target": "erros-por-dia" },
+  { "label": "Críticos", "icon": "critico", "query": { "dataset": "erros", "where": { "level": "CRITICAL" } }, "trend": true, "filter": { "level": "CRITICAL" } },
+  { "label": "Instâncias com erro", "icon": "maquina", "query": { "dataset": "erros", "agg": "distinct", "value": "instance" }, "unit": "de 3" },
+  { "label": "Disco da VM01", "icon": "disco", "value": 91, "unit": "%", "meter": { "max": 100, "thresholds": [80, 90] }, "status": "warning", "status_label": "Acima de 90%", "target": "recursos" }
 ]}
 ```
 
 - `value` (estático) ou `query` (recalculado com os filtros; mostra "no recorte" e "de N no total").
   O número anima de um valor ao outro.
 - `unit`: `%` cola no número, as outras unidades ficam com espaço.
+- `icon`: ícone SVG opcional (`erros`, `alerta`, `erro`, `critico`, `maquina`, `servico`, `cpu`,
+  `memoria`, `disco`, `tempo`, `calendario`, `issue`, `usuario`, `grafico`, `barras`, `lista`,
+  `check`, `percentual`, `filtro`, `info`). Quando omitido, o template escolhe um pelo `label`.
+- `meter`: barra de progresso com marcas de limite (`{ "max": 100, "thresholds": [80, 90] }`), ideal
+  para percentuais de CPU, memória, disco ou taxas. Se `status` for omitido, ele é derivado de
+  `thresholds` (`good` abaixo do primeiro, `warning` entre os dois, `critical` a partir do segundo).
+- `trend`: `true` (calcula a evolução por intervalo de `time` do dataset da `query`, respeitando o
+  recorte na aba de análise) ou uma lista de números (`[12, 15, 9, 28]`). Desenha uma sparkline no
+  rodapé do cartão.
 - `status`: `good`, `warning`, `serious`, `critical` ou `info`, sempre com bolinha e rótulo
   (`status_label`, ou "OK", "Atenção", "Grave", "Crítico", "Info"). A cor nunca aparece sozinha.
-  O status é fixo: ele descreve o relatório inteiro, não o recorte.
 - `hint`: linha pequena de contexto.
 - `target` (id de seção) e/ou `filter` (`{ "campo": valor }`): o cartão vira clicável. `filter`
   **substitui** o recorte atual e `target` rola até a seção.

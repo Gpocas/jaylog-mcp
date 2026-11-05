@@ -8,7 +8,8 @@ Esta página explica de onde eles vieram, para que uma mudança futura passe pel
 
 ## Marca
 
-- Faixa do topo: azul `#4f61ab` (70%) + laranja `#f5a700` (30%), as duas cores originais.
+- Barra de topo: gradiente azul `#4f61ab → #5a6cb5` no claro (e `#21262d → #30363d` no escuro) com
+  borda inferior laranja `#f5a700`, seguindo a moldura do Tachyon (profiler do CPython).
 - O laranja original **não** serve como cor de série: no tema claro passa da faixa de luminosidade
   (OKLCH L 0,785 > 0,77) e tem contraste de 1,97:1. As séries usam versões mais escuras do mesmo tom.
 
@@ -26,10 +27,10 @@ Esta página explica de onde eles vieram, para que uma mudança futura passe pel
 A ordem foi escolhida entre 27 ordens válidas, enumeradas com o validador: era a de maior
 separação para daltonismo nos dois temas.
 
-- Claro (superfície `#fcfcfb`): pior par vizinho com CVD ΔE 14,1 e visão normal ΔE 18,2. Os slots
+- Claro (superfície `#ffffff`): pior par vizinho com CVD ΔE 14,1 e visão normal ΔE 18,2. Os slots
   2, 3 e 6 ficam abaixo de 3:1 de contraste. A compensação exigida (rótulos ou tabela) é o botão
-  "Tabela" de todo gráfico.
-- Escuro (superfície `#1a1a19`): pior par vizinho com CVD ΔE 12,5 e visão normal ΔE 19,2. Todos ≥ 3:1.
+  "Tabela" de todo gráfico (além do interruptor "Números nas barras" na barra lateral).
+- Escuro (superfície `#0d1117`): pior par vizinho com CVD ΔE 12,5 e visão normal ΔE 19,2. Todos ≥ 3:1.
 
 O vermelho fica de fora das séries de propósito, para não ser confundido com a escala de gravidade.
 Mais de 6 séries não ganham cor nova: agrupe em "Outros" ou divida o gráfico.
@@ -88,11 +89,11 @@ O vermelho fica de fora para não ser lido como gravidade.
 Com a skill `dataviz` carregada (o caminho do validador aparece no diretório base dela):
 
 ```bash
-node <dataviz>/scripts/validate_palette.js "#4f61ab,#d38f01,#e87ba4,#008300,#6250d6,#1baf7a" --mode light
-node <dataviz>/scripts/validate_palette.js "#677bc7,#c28408,#d55181,#008300,#9085e9,#199e70" --mode dark --surface "#1a1a19"
-node <dataviz>/scripts/validate_palette.js "#ff7e76,#d23d3d,#9e0116" --ordinal --mode light
-node <dataviz>/scripts/validate_palette.js "#b61d25,#ef5854,#ff7e76" --ordinal --mode dark --surface "#1a1a19"
+node <dataviz>/scripts/validate_palette.js "#4f61ab,#d38f01,#e87ba4,#008300,#6250d6,#1baf7a" --mode light --surface "#ffffff"
+node <dataviz>/scripts/validate_palette.js "#677bc7,#c28408,#d55181,#008300,#9085e9,#199e70" --mode dark --surface "#0d1117"
+node <dataviz>/scripts/validate_palette.js "#ff7e76,#d23d3d,#9e0116" --ordinal --mode light --surface "#ffffff"
+node <dataviz>/scripts/validate_palette.js "#b61d25,#ef5854,#ff7e76" --ordinal --mode dark --surface "#0d1117"
 # divergente: confira a separação entre os polos (CVD e visão normal)
-node <dataviz>/scripts/validate_palette.js "#9a6a00,#2b3a78" --mode light
-node <dataviz>/scripts/validate_palette.js "#c28408,#9fb0ec" --mode dark --surface "#1a1a19"
+node <dataviz>/scripts/validate_palette.js "#9a6a00,#2b3a78" --mode light --surface "#ffffff"
+node <dataviz>/scripts/validate_palette.js "#c28408,#9fb0ec" --mode dark --surface "#0d1117"
 ```

@@ -42,20 +42,30 @@ filtrada no ponto certo.
 
 Vale saber, para montar o spec de forma que tudo isso funcione e para explicar ao usuário:
 
-- **Filtrar** por período (atalhos e intervalo), instância, nível, erro… na barra fixa do topo.
-  Tudo que tem `query` responde junto e os números sempre batem entre si.
+- **Filtrar** por período (atalhos e intervalo), instância, nível, erro… na barra lateral recolhível
+  e redimensionável à esquerda. Tudo que tem `query` responde junto e os números sempre batem entre
+  si.
+- **Ver o resumo do recorte e os 3 mais frequentes**: a barra lateral mostra 4 cartões com os totais
+  e a participação do recorte, além dos 3 itens que mais aparecem ("Mais frequentes", clicáveis para
+  abrir o painel de detalhes).
 - **Clicar para cruzar**: barra, dia, célula do heatmap, bloco do sankey ou linha de tabela viram
   filtro. Arrastar no gráfico de dias escolhe um período.
+- **Alternar visualização e consultar a legenda**: interruptores de dois estados ("Quantidade ↔
+  Proporção (%)" em barras empilhadas e "Números nas barras: Ocultos ↔ Visíveis") e legenda com
+  faixas por extenso na barra lateral.
 - **Ver correlações**: matriz "quais erros variam juntos", grafo de relações (onde cada erro
   acontece + ligações tracejadas entre erros que sobem juntos), sankey do caminho do volume e
   marcos de `events` (deploy, incidente) em todo gráfico de tempo.
-- **Abrir detalhes** de qualquer valor (chip de filtro, nó do grafo, célula de correlação): total,
-  participação, evolução, quebra por cada dimensão e "varia junto com".
+- **Abrir detalhes** de qualquer valor (chip de filtro, item de "Mais frequentes", nó do grafo,
+  célula de correlação): total, participação, evolução, quebra por cada dimensão e "varia junto com".
+- **Acompanhar na barra de status e no minimapa**: o rodapé mostra o recorte atual e troca pelos
+  dados do ponto sob o mouse em qualquer gráfico; a lateral direita da rolagem marca onde estão os
+  alertas e KPIs críticos/em atenção; o favicon na aba do navegador indica a situação geral.
 - **Ir do alerta à evidência**: alertas e KPIs com `filter`/`target` aplicam o recorte e rolam até
   o gráfico certo.
 - Compartilhar a visão filtrada (o recorte fica no endereço), baixar PNG, ver a tabela de qualquer
-  gráfico, alternar o tema. Gráficos e números animam ao aparecer e ao mudar de recorte, e as
-  animações somem com "reduzir movimento" do sistema.
+  gráfico, alternar o tema (salvo no navegador). Gráficos e números animam ao aparecer e ao mudar de
+  recorte, e as animações somem com "reduzir movimento" do sistema.
 
 ## 1. Escolher o relatório
 
