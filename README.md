@@ -316,11 +316,13 @@ npx skills add Gpocas/jaylog-mcp -g -y    # globais; sem -g para as de projeto
 Vale reinstalar também se as suas skills ainda mandam rodar `npx -y jaylog-mcp login`. É a
 instalação antiga via npmjs, que não é mais usada.
 
-- **`jaylog-incident-report`**: relatório em markdown de incidentes (erros nos logs, serviços
-  parados, agendamentos não cumpridos, issues e máquinas com recursos no limite). Começa com uma entrevista de múltipla escolha
-  para personalizar escopo (todos, favoritos ou serviços de um owner), período (padrão: dia
-  anterior), níveis de erro (todos, só CRITICAL e EXCEPTION, ou nenhum) e categorias. Salva em
-  `./reports/incidentes-AAAA-MM-DD.md`.
+- **`jaylog-incident-report`**: relatório de incidentes (erros nos logs, serviços parados,
+  agendamentos não cumpridos, issues e máquinas com recursos no limite) com 3 visualizações:
+  **Harness** (listas estruturadas direto no chat/terminal, padrão), **Markdown** (arquivo `.md` em
+  `./reports/incidentes-AAAA-MM-DD.md`) e **HTML** (painel interativo em `./reports/`). Começa com
+  uma entrevista de múltipla escolha para personalizar escopo (todos, favoritos ou serviços de um
+  owner), período (padrão: dia anterior), níveis de erro (todos, só CRITICAL e EXCEPTION, ou nenhum)
+  e categorias.
 - **`jaylog-fix-service-errors`**: levanta os erros recentes de um serviço (escolhido por nome,
   owner ou entre os favoritos), localiza o código responsável na pasta atual e **propõe**
   correções (não edita arquivos).

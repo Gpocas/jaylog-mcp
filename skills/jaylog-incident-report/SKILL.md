@@ -1,11 +1,11 @@
 ---
 name: jaylog-incident-report
-description: Gera um relatório de incidentes do ecossistema Jaylog em markdown (por padrão do dia anterior), consolidando erros nos logs, serviços parados, agendamentos não cumpridos, issues e máquinas com recursos no limite (CPU, memória, disco), depois de uma entrevista rápida de múltipla escolha para a pessoa personalizar escopo, período e conteúdo. Use sempre que o usuário pedir relatório de incidentes, resumo do que deu errado ontem, balanço diário de erros, "como foi a noite/o dia dos serviços", status dos bots/serviços, máquinas sobrecarregadas ou sem espaço em disco, relatório dos meus serviços favoritos ou de um dono específico, ou health check diário, mesmo que não cite "Jaylog" nem "relatório" explicitamente.
+description: Gera um relatório de incidentes do ecossistema Jaylog (por padrão do dia anterior) com 3 opções de visualização — Harness (listas estruturadas direto no chat/terminal, padrão), Markdown (arquivo .md com tabelas) e HTML interativo (painel com gráficos) —, consolidando erros nos logs, serviços parados, agendamentos não cumpridos, issues e máquinas com recursos no limite (CPU, memória, disco), depois de uma entrevista rápida de múltipla escolha para personalizar escopo, período e conteúdo. Use sempre que o usuário pedir relatório de incidentes, resumo do que deu errado ontem, balanço diário de erros, "como foi a noite/o dia dos serviços", status dos bots/serviços, máquinas sobrecarregadas ou sem espaço em disco, relatório dos meus serviços favoritos ou de um dono específico, ou health check diário, mesmo que não cite "Jaylog" nem "relatório" explicitamente.
 ---
 
 # Relatório de incidentes Jaylog
 
-Produz um relatório em markdown do que deu errado, usando as tools do MCP `jaylog` (somente leitura). O leitor típico abre o relatório de manhã para decidir o que atacar primeiro, então ele precisa dizer rápido **quem está quebrado, desde quando e quem acionar**, e deixar o detalhe para quem quiser se aprofundar. Como cada pessoa quer um recorte diferente (só os próprios serviços, só os erros graves, outro período...), a skill começa com uma entrevista curta para montar o relatório sob medida.
+Produz um relatório do que deu errado usando as tools do MCP `jaylog` (somente leitura), com **três modos de visualização**: **Harness** (padrão, formatado em listas estruturadas direto no chat para leitura perfeita no terminal, sem tabelas largas que quebram), **Markdown** (arquivo `.md` em `./reports/`) e **HTML** (painel visual interativo em `./reports/`). O leitor típico abre o relatório de manhã para decidir o que atacar primeiro, então ele precisa dizer rápido **quem está quebrado, desde quando e quem acionar**, e deixar o detalhe para quem quiser se aprofundar. Como cada pessoa quer um recorte diferente (só os próprios serviços, só os erros graves, outro período...), a skill começa com uma entrevista curta para montar o relatório sob medida.
 
 Se as tools do Jaylog (`list-logs`, `get-latest-logs` etc.) não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y github:Gpocas/jaylog-mcp login`, com `JAYLOG_URL` definida) e pare. Não invente dados.
 
@@ -30,7 +30,7 @@ Regras para não virar burocracia:
 - Nada marcado em "Categorias" significa todas. "Nenhum" em "Erros" com nada marcado em "Categorias" também significa todas as categorias, sem erros dos logs.
 - Se escolheu "Serviços de um owner", faça uma pergunta de texto curta pedindo o nome ou e-mail do dono.
 - **Contatos e mensagem completa** dos erros principais entram sempre, sem pergunta. Só tire se o pedido disser ("sem contatos", "só a mensagem principal").
-- **Versão em HTML**: não pergunte na entrevista. Gere se o pedido mencionar HTML, gráfico, painel ou dashboard; senão, ofereça na resposta final (etapa 7).
+- **Formato de visualização (Harness, Markdown, HTML)**: não pergunte na entrevista. Por padrão, apresente na visualização **Harness** (direto no chat, em listas estruturadas sem tabelas Markdown) e ofereça salvar em Markdown (`.md`) ou gerar a versão interativa em HTML (`.html`) na última linha. Se o pedido inicial já pedir Markdown ("em markdown", "salvar .md") ou HTML ("em html", "com gráfico", "painel", "dashboard"), gere o formato pedido e responda com o resumo curto da etapa 7.
 
 Guarde as escolhas: elas guiam a coleta e vão para o cabeçalho do relatório, para o leitor saber o que está (e o que não está) ali.
 
@@ -90,15 +90,80 @@ Em todas as categorias, descarte o que não pertence aos serviços do escopo (et
 
 Para cada serviço que aparece em alguma categoria, busque quem acionar: `list-service-key-users` (filtro `service_id`) e `list-key-users` para nome e e-mail. O `owner` que vem em `list-services` é só um ID de usuário, sem nome; cite o nome do dono apenas quando você o tiver (por exemplo, vindo de `search-services-by-owner`). Um incidente sem contato é pouco acionável, por isso os contatos entram sempre; só tire a coluna "Contato" se o pedido disser "sem contatos".
 
-## 6. Escrever o relatório
+## 6. Montar e entregar o relatório (3 visualizações)
 
-Salve em `./reports/`, criando a pasta se não existir:
+Em qualquer visualização, ordene os itens de cada categoria sempre por gravidade: **CRITICAL**, depois **EXCEPTION**, depois **ERROR** (a mesma escala da skill `jaylog-html-report`); dentro do mesmo nível, mais ocorrências primeiro. Omita as seções e campos que a personalização excluiu. Uma categoria selecionada que não teve ocorrências deve aparecer com a linha `"Nenhum incidente identificado."` (e o resumo do topo só conta as categorias incluídas).
+
+Quando o usuário pedir outro formato depois da primeira entrega (por exemplo, pedir o `.md` ou o `.html` após ver no Harness), **reaproveite os dados já coletados** e não consulte as tools do Jaylog de novo.
+
+### a) Visualização Harness (padrão — direto no chat/terminal)
+
+Use esta visualização por padrão quando o usuário não tiver pedido especificamente arquivo Markdown ou HTML. Muitos harnesses de terminal/TUI não renderizam bem tabelas Markdown de várias colunas (o texto quebra e desalinha); por isso, **não use tabelas Markdown (`| col | col |`) na visualização Harness**. Use apenas títulos (`##`), listas estruturadas com marcadores curtos e blocos de código (` ```text `) somente para tracebacks resumidos:
+
+````markdown
+# Relatório de incidentes — DD/MM/AAAA
+Janela: <início> a <fim> (<fuso>)
+Escopo: <todos os serviços | favoritos de <usuário> | serviços de <owner>> · Erros: <níveis> · Categorias: <lista>
+
+## Resumo
+- **Erros nos logs:** N serviços com erros (X no total: C CRITICAL, E EXCEPTION, R ERROR)
+- **Serviços parados:** N
+- **Agendamentos não cumpridos:** N
+- **Issues abertas/alteradas:** N
+- **Máquinas com recursos no limite:** N
+
+**Prioridades:**
+1. **<Serviço / problema 1>** — o que atacar primeiro, impacto e quem acionar (`email`).
+2. **<Serviço / problema 2>** — ...
+
+## Erros nos logs
+- **[NÍVEL · N×] SERVIÇO** (`HH:MM` a `HH:MM`)
+  - Mensagem: `<mensagem principal>`
+  - Hosts: `<host (usuário), ...>` · Log ID: `<id>`
+  - Contato: <Nome (`email`)>
+
+**Detalhe dos principais erros (traceback resumido):**
+- **SERVIÇO** (`<host / usuário>` · Log ID `<id>`):
+  ```text
+  <1 a 5 linhas principais do traceback, com dados sensíveis mascarados>
+  ```
+
+## Serviços parados
+- **SERVIÇO** — `<host / usuário>` (última atividade: `DD/MM/AAAA HH:MM`)
+  - Observação: <status de execução/recursos antes de parar ou duplicidade>
+  - Contato: <Nome (`email`)>
+
+## Agendamentos não cumpridos
+- **SERVIÇO** — `<REPETIÇÃO> <horário> (<origem>)`
+  - Esperado: <quando deveria rodar> · Observado: <o que ocorreu nos logs>
+  - Contato: <Nome (`email`)>
+
+## Issues
+- **[ESTADO] SERVIÇO** — `<título / id da issue>`
+  - Responsável: <nome> · Observação: <detalhe>
+
+## Recursos das máquinas
+- **MÁQUINA** — `<serviços / usuários afetados>`
+  - Alerta: <alerta reportado>
+  - Uso (agora / pico): <processo e host>
+  - Contato: <Nome (`email`)>
+
+## Limitações
+- <O que foi parcial, janela em andamento ou categorias sem dados>
+````
+
+Ao final da visualização Harness, termine com uma única linha oferecendo os outros formatos:
+`"Quer salvar em arquivo Markdown (.md) ou gerar a versão interativa em HTML (.html)?"`
+
+### b) Visualização Markdown (arquivo `.md` em `./reports/`)
+
+Gere quando o usuário pedir arquivo Markdown no pedido inicial ou depois da resposta no Harness. Salve em `./reports/`, criando a pasta se não existir:
 
 - Um dia: `incidentes-AAAA-MM-DD.md` (data do dia **analisado**, não a de hoje).
 - Vários dias: `incidentes-AAAA-MM-DD_a_AAAA-MM-DD.md`.
 - Escopo diferente de "todos": acrescente `-favoritos` ou `-<owner>` (nome em minúsculas, sem acentos nem espaços), para um relatório recortado não sobrescrever o geral.
 
-Se o arquivo já existir, sobrescreva: o relatório é regerável a partir dos dados. Use este formato, em português, **omitindo as seções e colunas que a personalização excluiu**:
+Se o arquivo já existir, sobrescreva: o relatório é regerável a partir dos dados. No arquivo `.md`, use tabelas GFM completas:
 
 ```markdown
 # Relatório de incidentes — DD/MM/AAAA
@@ -137,19 +202,14 @@ Prioridades: 1–3 linhas dizendo o que atacar primeiro e por quê.
 O que não pôde ser verificado ou foi amostrado (resposta truncada, categoria sem campo de data etc.).
 ```
 
-Ordene cada tabela por gravidade, sempre nesta ordem: CRITICAL, depois EXCEPTION, depois ERROR (a mesma escala da skill `jaylog-html-report`); dentro do mesmo nível, mais ocorrências primeiro. Categoria selecionada sem ocorrências: uma linha "Nenhum incidente identificado." no lugar da tabela. O resumo só conta as categorias incluídas.
+### c) Visualização HTML (painel interativo `.html` em `./reports/`)
 
-### Versão em HTML (se pedida)
+Gere quando o usuário pedir HTML, gráfico, painel ou dashboard (no pedido inicial ou após o Harness/Markdown), usando a skill `jaylog-html-report` (tipo "Incidentes") e reaproveitando os dados já coletados. Use o mesmo nome base do markdown, com `.spec.json` e `.html` (ex.: `reports/incidentes-2026-11-05.html`). Cada categoria escolhida vira uma seção, e as que não tiveram ocorrência viram uma seção `text` com `"Nenhum incidente identificado."`.
 
-Depois de salvar o markdown, gere a versão visual com a skill `jaylog-html-report` (tipo
-"Incidentes"), reaproveitando os dados já coletados. Não consulte as tools de novo. Use o mesmo nome
-base do markdown, com `.spec.json` e `.html` (ex.: `reports/incidentes-2026-11-03.html`). Cada
-categoria escolhida vira uma seção, e as que não tiveram ocorrência viram uma seção `text` com
-"Nenhum incidente identificado.".
+## 7. Responder no chat quando gerar arquivo (`.md` ou `.html`)
 
-## 7. Responder no chat
-
-Termine com um resumo curto (3–6 linhas): as escolhas de personalização usadas, os números do topo, a prioridade principal e o caminho do arquivo gerado. Se não gerou a versão em HTML, ofereça numa linha ("Quer a versão interativa em HTML?"). Não cole o relatório inteiro no chat; ele está no arquivo.
+- Se a entrega foi na visualização **Harness** (etapa 6a), o próprio relatório estruturado em listas já é a resposta no chat (não repita um segundo resumo abaixo dele; apenas finalize oferecendo `.md` ou `.html`).
+- Se você gerou um arquivo **Markdown (`.md`)** ou **HTML (`.html`)**, não cole o relatório inteiro no chat: responda apenas com um resumo curto (3–6 linhas) contendo as escolhas de personalização usadas, os números do topo, a prioridade principal, o caminho do arquivo gerado e, se gerou só um dos arquivos, ofereça o outro numa linha (ex.: `"Quer também a versão interativa em HTML?"`).
 
 ## Cuidados
 
