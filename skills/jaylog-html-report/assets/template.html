@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="jaylog-html-report">
+<title>{{TITLE}}</title>
+<style>
+/* Paleta derivada das cores do OpenTelemetry (azul hsl(228,37%,49%) e laranja hsl(41,100%,48%)),
+   validada com o validate_palette.js da skill dataviz: séries em ordem fixa, escala de gravidade
+   ordinal (um tom, claro→escuro) e status reservados. Ver references/palette.md. */
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.10);
+  --brand: #4f61ab;
+  --brand-accent: #f5a700;
+  --s1: #4f61ab; --s2: #d38f01; --s3: #e87ba4; --s4: #008300; --s5: #6250d6; --s6: #1baf7a;
+  --sev-error: #ff7e76; --sev-exception: #d23d3d; --sev-critical: #9e0116;
+  --seq-low: #e4e8f6; --seq-high: #2b3a78;
+  --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b; --info: #4f61ab;
+  --good-text: #006300; --warning-text: #8a5a00; --critical-text: #b42323;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10);
+    --brand: #677bc7;
+    --s1: #677bc7; --s2: #c28408; --s3: #d55181; --s4: #008300; --s5: #9085e9; --s6: #199e70;
+    --sev-error: #b61d25; --sev-exception: #ef5854; --sev-critical: #ff7e76;
+    --seq-low: #20263d; --seq-high: #9fb0ec;
+    --good-text: #0ca30c; --warning-text: #fab219; --critical-text: #ff7e76;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255, 255, 255, 0.10);
+  --brand: #677bc7;
+  --s1: #677bc7; --s2: #c28408; --s3: #d55181; --s4: #008300; --s5: #9085e9; --s6: #199e70;
+  --sev-error: #b61d25; --sev-exception: #ef5854; --sev-critical: #ff7e76;
+  --seq-low: #20263d; --seq-high: #9fb0ec;
+  --good-text: #0ca30c; --warning-text: #fab219; --critical-text: #ff7e76;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--ink);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.brand-bar { height: 4px; background: linear-gradient(90deg, var(--brand) 0 70%, var(--brand-accent) 70% 100%); }
+header.page, main, footer.page { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+header.page { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; padding-top: 24px; padding-bottom: 8px; }
+header.page h1 { margin: 0; font-size: 24px; line-height: 1.25; }
+header.page .subtitle { margin: 4px 0 0; color: var(--ink-2); }
+header.page .meta { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+button {
+  font: inherit; font-size: 12px; color: var(--ink-2); background: transparent; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px;
+}
+button:hover { color: var(--ink); background: var(--border); }
+section.block { margin: 16px 0; }
+section.block > h2 { font-size: 16px; margin: 24px 0 4px; }
+section.block > p.description { margin: 0 0 8px; color: var(--ink-2); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.kpi .label { color: var(--ink-2); font-size: 12px; }
+.kpi .value { font-size: 28px; font-weight: 600; line-height: 1.2; margin-top: 4px; }
+.kpi .unit { font-size: 14px; font-weight: 400; color: var(--ink-2); }
+.kpi .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; margin-top: 6px; }
+.status .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.status.good { color: var(--good-text); } .status.good .dot { background: var(--good); }
+.status.warning { color: var(--warning-text); } .status.warning .dot { background: var(--warning); }
+.status.serious { color: var(--warning-text); } .status.serious .dot { background: var(--serious); }
+.status.critical { color: var(--critical-text); } .status.critical .dot { background: var(--critical); }
+.status.info { color: var(--ink-2); } .status.info .dot { background: var(--info); }
+.chart-head { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+.chart { width: 100%; height: 340px; }
+.data-view { display: none; margin-top: 8px; max-height: 360px; overflow: auto; }
+.data-view.open { display: block; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { color: var(--ink-2); font-weight: 600; font-size: 12px; position: sticky; top: 0; background: var(--surface); cursor: pointer; user-select: none; }
+th[aria-sort="ascending"]::after { content: " ▲"; } th[aria-sort="descending"]::after { content: " ▼"; }
+td.num, th.num { text-align: right; }
+td .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+.table-wrap { overflow-x: auto; }
+.alerts { display: grid; gap: 8px; }
+.alert { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; }
+.alert .badge { grid-row: span 2; margin-top: 2px; }
+.alert .title { font-weight: 600; }
+.alert .detail { color: var(--ink-2); grid-column: 2; }
+.text p { margin: 0 0 8px; } .text ul { margin: 0 0 8px; padding-left: 20px; }
+footer.page { color: var(--muted); font-size: 12px; padding-top: 16px; padding-bottom: 32px; }
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .card, section.block { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="brand-bar"></div>
+<header class="page">
+  <div>
+    <h1 id="title"></h1>
+    <p class="subtitle" id="subtitle"></p>
+    <p class="meta" id="meta"></p>
+  </div>
+  <button class="no-print" id="theme-toggle" type="button">Tema escuro</button>
+</header>
+<main id="report"></main>
+<footer class="page" id="footer"></footer>
+
+<script type="application/json" id="report-data">{{REPORT_DATA}}</script>
+<script>{{ECHARTS}}</script>
+<script>
+(function () {
+  'use strict';
+  var spec = JSON.parse(document.getElementById('report-data').textContent);
+  var root = document.documentElement;
+  var charts = [];
+  var nf = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 });
+  var SEVERITY = { ERROR: '--sev-error', EXCEPTION: '--sev-exception', CRITICAL: '--sev-critical' };
+  var STATUS_LABEL = { good: 'OK', warning: 'Atenção', serious: 'Grave', critical: 'Crítico', info: 'Info' };
+
+  function esc(text) {
+    return String(text).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+  }
+  function css(name) { return getComputedStyle(root).getPropertyValue(name).trim(); }
+  function el(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined && text !== null) node.textContent = String(text);
+    return node;
+  }
+  function fmt(value, unit) {
+    if (value === null || value === undefined || value === '') return '—';
+    if (typeof value === 'number') return nf.format(value) + (unit === '%' ? '%' : unit ? ' ' + unit : '');
+    return String(value);
+  }
+  function fmtDate(value) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(String(value));
+    if (!m) return String(value);
+    return m[3] + '/' + m[2] + (m[4] ? ' ' + m[4] + ':' + m[5] : '');
+  }
+  function statusBadge(status, label) {
+    var badge = el('span', 'status ' + (status || 'info'));
+    badge.appendChild(el('span', 'dot'));
+    badge.appendChild(el('span', null, label || STATUS_LABEL[status] || status));
+    return badge;
+  }
+  function seriesColor(chart, series, index) {
+    if (series.color && SEVERITY[String(series.color).toUpperCase()]) return css(SEVERITY[String(series.color).toUpperCase()]);
+    if (chart.palette === 'severity' && SEVERITY[String(series.name).toUpperCase()]) return css(SEVERITY[String(series.name).toUpperCase()]);
+    return css('--s' + (index + 1));
+  }
+
+  // ---------- data view (table fallback for every chart) ----------
+  function buildTable(columns, rows) {
+    var wrap = el('div', 'table-wrap');
+    var table = el('table');
+    var thead = el('thead'); var tr = el('tr');
+    columns.forEach(function (col, ci) {
+      var th = el('th', col.align === 'right' || col.numeric ? 'num' : '', col.label);
+      th.addEventListener('click', function () { sortBy(ci, th); });
+      tr.appendChild(th);
+    });
+    thead.appendChild(tr); table.appendChild(thead);
+    var tbody = el('tbody');
+    function render(list) {
+      tbody.textContent = '';
+      list.forEach(function (row) {
+        var r = el('tr');
+        columns.forEach(function (col) {
+          var value = row[col.key];
+          var td = el('td', col.align === 'right' || col.numeric ? 'num' : '');
+          if (col.format === 'status' && value) td.appendChild(statusBadge(value));
+          else if (col.format === 'code') td.appendChild(el('span', 'mono', value === null || value === undefined ? '—' : value));
+          else if (col.format === 'date') td.textContent = value ? fmtDate(value) : '—';
+          else td.textContent = fmt(value, col.unit);
+          r.appendChild(td);
+        });
+        tbody.appendChild(r);
+      });
+    }
+    var current = rows.slice();
+    function sortBy(ci, th) {
+      var key = columns[ci].key;
+      var dir = th.getAttribute('aria-sort') === 'descending' ? 'ascending' : 'descending';
+      Array.prototype.forEach.call(thead.querySelectorAll('th'), function (h) { h.removeAttribute('aria-sort'); });
+      th.setAttribute('aria-sort', dir);
+      current.sort(function (a, b) {
+        var x = a[key], y = b[key];
+        var cmp = typeof x === 'number' && typeof y === 'number' ? x - y : String(x === undefined || x === null ? '' : x).localeCompare(String(y === undefined || y === null ? '' : y), 'pt-BR');
+        return dir === 'ascending' ? cmp : -cmp;
+      });
+      render(current);
+    }
+    render(current);
+    table.appendChild(tbody); wrap.appendChild(table);
+    return wrap;
+  }
+
+  function chartTable(chart) {
+    var columns, rows;
+    if (chart.kind === 'heatmap') {
+      columns = [{ key: 'y', label: chart.y_label || '' }, { key: 'x', label: chart.x_label || '' }, { key: 'v', label: chart.unit || 'Valor', numeric: true }];
+      rows = chart.values.map(function (t) { return { y: chart.y[t[1]], x: chart.x[t[0]], v: t[2] }; });
+    } else {
+      var cats = chart.kind === 'line' ? chart.x : chart.categories;
+      columns = [{ key: 'c', label: chart.x_label || '' }].concat(chart.series.map(function (s, i) { return { key: 's' + i, label: s.name, numeric: true, unit: chart.unit }; }));
+      rows = cats.map(function (c, ci) {
+        var row = { c: chart.dates ? fmtDate(c) : c };
+        chart.series.forEach(function (s, si) { row['s' + si] = s.values[ci]; });
+        return row;
+      });
+    }
+    return buildTable(columns, rows);
+  }
+
+  // ---------- ECharts options ----------
+  function baseOption(chart) {
+    var ink2 = css('--ink-2'), muted = css('--muted'), grid = css('--grid'), axis = css('--axis'), surface = css('--surface');
+    return {
+      backgroundColor: 'transparent',
+      textStyle: { fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif', color: ink2 },
+      grid: { left: 8, right: 24, top: chart.series && chart.series.length > 1 ? 40 : 16, bottom: 8, containLabel: true },
+      legend: chart.series && chart.series.length > 1 ? { top: 0, left: 0, icon: 'roundRect', itemWidth: 12, itemHeight: 12, textStyle: { color: ink2 } } : undefined,
+      tooltip: {
+        confine: true, backgroundColor: surface, borderColor: css('--border'), textStyle: { color: css('--ink') },
+        valueFormatter: function (v) { return fmt(v, chart.unit); }
+      },
+      _axis: { axisLine: { lineStyle: { color: axis } }, axisTick: { show: false }, axisLabel: { color: muted }, splitLine: { lineStyle: { color: grid } } }
+    };
+  }
+  function valueAxis(base, chart) {
+    return Object.assign({ type: 'value', max: chart.y_max, min: chart.y_min,
+      axisLabel: { color: css('--muted'), formatter: function (v) { return nf.format(v) + (chart.unit === '%' ? '%' : ''); } },
+      splitLine: base._axis.splitLine, axisLine: { show: false }, axisTick: { show: false } });
+  }
+  function categoryAxis(base, chart, data) {
+    return { type: 'category', data: data.map(function (c) { return chart.dates ? fmtDate(c) : c; }),
+      axisLine: base._axis.axisLine, axisTick: base._axis.axisTick, axisLabel: { color: css('--muted'), hideOverlap: true } };
+  }
+  function thresholdLines(chart) {
+    if (!chart.thresholds || !chart.thresholds.length) return undefined;
+    return {
+      symbol: 'none', silent: true,
+      data: chart.thresholds.map(function (t) {
+        var color = css('--' + (t.status || 'warning'));
+        return { yAxis: t.value, lineStyle: { color: color, type: 'dashed', width: 1 },
+          label: { formatter: (t.label || STATUS_LABEL[t.status] || '') + ' ' + fmt(t.value, chart.unit), color: css('--ink-2'), position: 'insideEndTop' } };
+      })
+    };
+  }
+
+  function optionFor(chart) {
+    var base = baseOption(chart);
+    var surface = css('--surface');
+    var option = { backgroundColor: base.backgroundColor, textStyle: base.textStyle, grid: base.grid, legend: base.legend, tooltip: base.tooltip };
+    if (chart.kind === 'line') {
+      option.tooltip.trigger = 'axis';
+      option.tooltip.axisPointer = { type: 'line', lineStyle: { color: css('--axis') } };
+      option.xAxis = categoryAxis(base, chart, chart.x);
+      option.xAxis.boundaryGap = false;
+      option.yAxis = valueAxis(base, chart);
+      option.series = chart.series.map(function (s, i) {
+        var color = seriesColor(chart, s, i);
+        return { name: s.name, type: 'line', data: s.values, color: color, showSymbol: false, symbolSize: 8,
+          lineStyle: { width: 2 }, connectNulls: false, emphasis: { focus: 'series' },
+          markLine: i === 0 ? thresholdLines(chart) : undefined };
+      });
+    } else if (chart.kind === 'bar') {
+      var horizontal = !!chart.horizontal;
+      option.tooltip.trigger = 'axis';
+      option.tooltip.axisPointer = { type: 'shadow' };
+      var cat = categoryAxis(base, chart, chart.categories);
+      var val = valueAxis(base, chart);
+      if (horizontal) { cat.inverse = true; option.xAxis = val; option.yAxis = cat; }
+      else { option.xAxis = cat; option.yAxis = val; }
+      var last = chart.series.length - 1;
+      option.series = chart.series.map(function (s, i) {
+        var color = seriesColor(chart, s, i);
+        var end = !chart.stacked || i === last;
+        var radius = end ? (horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]) : 0;
+        return { name: s.name, type: 'bar', data: s.values, color: color, stack: chart.stacked ? 'total' : undefined,
+          barMaxWidth: 28, itemStyle: { borderRadius: radius, borderColor: surface, borderWidth: chart.stacked ? 1 : 0 },
+          emphasis: { focus: 'series' }, markLine: i === 0 ? thresholdLines(chart) : undefined };
+      });
+    } else if (chart.kind === 'heatmap') {
+      var max = chart.values.reduce(function (m, t) { return Math.max(m, t[2] || 0); }, 0);
+      option.tooltip.trigger = 'item';
+      option.tooltip.formatter = function (p) { return esc(chart.y[p.value[1]]) + ' · ' + esc(chart.dates ? fmtDate(chart.x[p.value[0]]) : chart.x[p.value[0]]) + '<br><b>' + esc(fmt(p.value[2], chart.unit)) + '</b>'; };
+      option.grid.bottom = 72;
+      option.xAxis = { type: 'category', data: chart.x.map(function (c) { return chart.dates ? fmtDate(c) : c; }), splitArea: { show: false }, axisLabel: { color: css('--muted') }, axisLine: base._axis.axisLine, axisTick: base._axis.axisTick };
+      option.yAxis = { type: 'category', data: chart.y, inverse: true, axisLabel: { color: css('--muted') }, axisLine: base._axis.axisLine, axisTick: base._axis.axisTick };
+      option.visualMap = { min: 0, max: max || 1, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemHeight: 160,
+        inRange: { color: [css('--seq-low'), css('--seq-high')] }, textStyle: { color: css('--muted') } };
+      option.series = [{ type: 'heatmap', data: chart.values, itemStyle: { borderColor: surface, borderWidth: 2, borderRadius: 2 },
+        label: { show: chart.values.length <= 120, color: css('--ink'), formatter: function (p) { return p.value[2] ? nf.format(p.value[2]) : ''; } } }];
+    }
+    return option;
+  }
+
+  // ---------- sections ----------
+  function renderKpis(section, host) {
+    var grid = el('div', 'kpis');
+    section.items.forEach(function (item) {
+      var card = el('div', 'card kpi');
+      card.appendChild(el('div', 'label', item.label));
+      var value = el('div', 'value', typeof item.value === 'number' ? nf.format(item.value) : (item.value === null || item.value === undefined ? '—' : item.value));
+      if (item.unit) value.appendChild(el('span', 'unit', item.unit === '%' ? '%' : ' ' + item.unit));
+      card.appendChild(value);
+      if (item.status) card.appendChild(statusBadge(item.status, item.status_label));
+      if (item.hint) card.appendChild(el('div', 'hint', item.hint));
+      grid.appendChild(card);
+    });
+    host.appendChild(grid);
+  }
+  function renderChart(section, host) {
+    var chart = section.chart;
+    var card = el('div', 'card');
+    var head = el('div', 'chart-head no-print');
+    var toggle = el('button', null, 'Ver dados');
+    toggle.type = 'button';
+    head.appendChild(toggle);
+    card.appendChild(head);
+    var box = el('div', 'chart');
+    if (chart.height) box.style.height = chart.height + 'px';
+    box.setAttribute('role', 'img');
+    box.setAttribute('aria-label', section.title || 'Gráfico');
+    card.appendChild(box);
+    var dataView = el('div', 'data-view');
+    dataView.appendChild(chartTable(chart));
+    card.appendChild(dataView);
+    toggle.addEventListener('click', function () {
+      var open = dataView.classList.toggle('open');
+      toggle.textContent = open ? 'Ocultar dados' : 'Ver dados';
+    });
+    host.appendChild(card);
+    charts.push({ box: box, chart: chart, instance: null });
+  }
+  function renderTable(section, host) {
+    var card = el('div', 'card');
+    card.appendChild(buildTable(section.columns, section.rows));
+    host.appendChild(card);
+  }
+  function renderAlerts(section, host) {
+    var list = el('div', 'alerts');
+    section.items.forEach(function (item) {
+      var card = el('div', 'card alert');
+      var badge = statusBadge(item.severity || 'info');
+      badge.classList.add('badge');
+      card.appendChild(badge);
+      card.appendChild(el('div', 'title', item.title));
+      if (item.detail) card.appendChild(el('div', 'detail', item.detail));
+      list.appendChild(card);
+    });
+    host.appendChild(list);
+  }
+  function renderText(section, host) {
+    var card = el('div', 'card text');
+    (section.paragraphs || []).forEach(function (p) { card.appendChild(el('p', null, p)); });
+    if (section.bullets && section.bullets.length) {
+      var ul = el('ul');
+      section.bullets.forEach(function (b) { ul.appendChild(el('li', null, b)); });
+      card.appendChild(ul);
+    }
+    host.appendChild(card);
+  }
+
+  function drawCharts() {
+    charts.forEach(function (c) {
+      if (c.instance) c.instance.dispose();
+      c.instance = echarts.init(c.box, null, { renderer: 'canvas' });
+      c.instance.setOption(optionFor(c.chart));
+    });
+  }
+
+  // ---------- page ----------
+  document.getElementById('title').textContent = spec.title;
+  document.getElementById('subtitle').textContent = spec.subtitle || '';
+  var generated = new Date(spec.generated_at);
+  document.getElementById('meta').textContent = 'Gerado em ' + generated.toLocaleString('pt-BR') + (spec.period ? ' · ' + spec.period : '');
+  var footer = document.getElementById('footer');
+  footer.appendChild(el('div', null, 'Fonte: ' + (spec.source || 'Jaylog MCP')));
+  footer.appendChild(el('div', null, 'Relatório autocontido · gráficos com Apache ECharts (licença Apache-2.0)'));
+
+  var main = document.getElementById('report');
+  spec.sections.forEach(function (section) {
+    var block = el('section', 'block');
+    if (section.title) block.appendChild(el('h2', null, section.title));
+    if (section.description) block.appendChild(el('p', 'description', section.description));
+    ({ kpis: renderKpis, chart: renderChart, table: renderTable, alerts: renderAlerts, text: renderText })[section.type](section, block);
+    main.appendChild(block);
+  });
+
+  var toggle = document.getElementById('theme-toggle');
+  function isDark() { return css('color-scheme') === 'dark'; }
+  function syncToggle() { toggle.textContent = isDark() ? 'Tema claro' : 'Tema escuro'; }
+  toggle.addEventListener('click', function () {
+    root.setAttribute('data-theme', isDark() ? 'light' : 'dark');
+    syncToggle();
+    drawCharts();
+  });
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+      if (!root.hasAttribute('data-theme')) { syncToggle(); drawCharts(); }
+    });
+  }
+  window.addEventListener('resize', function () { charts.forEach(function (c) { if (c.instance) c.instance.resize(); }); });
+  window.addEventListener('beforeprint', function () { charts.forEach(function (c) { if (c.instance) c.instance.resize(); }); });
+  syncToggle();
+  drawCharts();
+})();
+</script>
+</body>
+</html>

@@ -306,6 +306,12 @@ instalação antiga via npmjs, que não é mais usada.
 - **`jaylog-fix-service-errors`**: levanta os erros recentes de um serviço (escolhido por nome,
   owner ou entre os favoritos), localiza o código responsável na pasta atual e **propõe**
   correções (não edita arquivos).
+- **`jaylog-html-report`**: relatórios visuais em **HTML autocontido**: um único arquivo, com os
+  gráficos ECharts embutidos, que abre offline e atrás de proxy. Cobre panorama de um serviço, saúde
+  de máquinas, incidentes e comparativo de serviços. O modelo monta um JSON com os dados e o script
+  `scripts/build.mjs` (Node, sem dependências) gera o HTML a partir de um template padrão, com tema
+  claro/escuro, tabela "Ver dados" em todo gráfico e cores baseadas no OpenTelemetry, validadas para
+  daltonismo.
 - **`jaylog-open-issue`**: decide se um bug merece issue (já corrigido numa versão mais nova?
   já existe issue igual? é regressão?) e, se merecer, monta a issue com versão/ambiente, causa,
   condições de recorrência e um Exemplo Mínimo Reproduzível (EMR). Mostra uma prévia e só chama
@@ -318,6 +324,7 @@ instalação antiga via npmjs, que não é mais usada.
 skills/
 ├── jaylog-incident-report/SKILL.md
 ├── jaylog-fix-service-errors/SKILL.md
+├── jaylog-html-report/          → SKILL.md, template, ECharts embutido, build.mjs
 └── jaylog-open-issue/SKILL.md
 src/
 ├── index.ts        → bootstrap do McpServer (stdio)

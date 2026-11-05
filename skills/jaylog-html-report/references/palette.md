@@ -1,0 +1,70 @@
+# Paleta
+
+As cores vêm do OpenTelemetry (`$otel-colors` do site opentelemetry.io): azul `hsl(228,37%,49%)` =
+`#4f61ab` e laranja `hsl(41,100%,48%)` = `#f5a700`. Elas foram ajustadas e validadas com o
+`validate_palette.js` da skill `dataviz` (Delta E em OKLab, simulação de daltonismo
+Machado-Oliveira-Fernandes 2009). Os valores ficam no `assets/template.html` como variáveis CSS.
+Esta página explica de onde eles vieram, para que uma mudança futura passe pelo mesmo teste.
+
+## Marca
+
+- Faixa do topo: azul `#4f61ab` (70%) + laranja `#f5a700` (30%), as duas cores originais.
+- O laranja original **não** serve como cor de série: no tema claro passa da faixa de luminosidade
+  (OKLCH L 0,785 > 0,77) e tem contraste de 1,97:1. As séries usam versões mais escuras do mesmo tom.
+
+## Séries (categórica, ordem fixa)
+
+| Slot | Tom | Claro | Escuro |
+|---|---|---|---|
+| 1 | azul OTel | `#4f61ab` | `#677bc7` |
+| 2 | âmbar OTel | `#d38f01` | `#c28408` |
+| 3 | magenta | `#e87ba4` | `#d55181` |
+| 4 | verde | `#008300` | `#008300` |
+| 5 | violeta | `#6250d6` | `#9085e9` |
+| 6 | água | `#1baf7a` | `#199e70` |
+
+A ordem foi escolhida entre 27 ordens válidas, enumeradas com o validador: era a de maior
+separação para daltonismo nos dois temas.
+
+- Claro (superfície `#fcfcfb`): pior par vizinho com CVD ΔE 14,1 e visão normal ΔE 18,2. Os slots
+  2, 3 e 6 ficam abaixo de 3:1 de contraste. A compensação exigida (rótulos ou tabela) é o botão
+  "Ver dados" de todo gráfico.
+- Escuro (superfície `#1a1a19`): pior par vizinho com CVD ΔE 12,5 e visão normal ΔE 19,2. Todos ≥ 3:1.
+
+O vermelho fica de fora das séries de propósito, para não ser confundido com a escala de gravidade.
+Mais de 6 séries não ganham cor nova: agrupe em "Outros" ou divida o gráfico.
+
+## Gravidade (ordinal: ERROR < EXCEPTION < CRITICAL)
+
+Um único tom de vermelho (o do status crítico), em três níveis de luminosidade. No escuro a ordem se
+inverte: o mais grave é o mais claro, porque é o que mais se destaca no fundo escuro.
+
+| Nível | Claro | Escuro |
+|---|---|---|
+| ERROR | `#ff7e76` | `#b61d25` |
+| EXCEPTION | `#d23d3d` | `#ef5854` |
+| CRITICAL | `#9e0116` | `#ff7e76` |
+
+As duas versões passam no `--ordinal`: luminosidade monotônica, degraus visíveis e a ponta mais
+próxima do fundo com contraste ≥ 2:1.
+
+## Status (reservado)
+
+`good #0ca30c`, `warning #fab219`, `serious #ec835a`, `critical #d03b3b`, `info` = azul da marca.
+São as cores da paleta de referência da `dataviz`. Status sempre aparece com bolinha e rótulo,
+nunca só pela cor, e nunca é usado como cor de série.
+
+## Sequencial (heatmap)
+
+Do azul quase branco ao azul profundo: claro `#e4e8f6` → `#2b3a78`, escuro `#20263d` → `#9fb0ec`.
+
+## Revalidar depois de mudar uma cor
+
+Com a skill `dataviz` carregada (o caminho do validador aparece no diretório base dela):
+
+```bash
+node <dataviz>/scripts/validate_palette.js "#4f61ab,#d38f01,#e87ba4,#008300,#6250d6,#1baf7a" --mode light
+node <dataviz>/scripts/validate_palette.js "#677bc7,#c28408,#d55181,#008300,#9085e9,#199e70" --mode dark --surface "#1a1a19"
+node <dataviz>/scripts/validate_palette.js "#ff7e76,#d23d3d,#9e0116" --ordinal --mode light
+node <dataviz>/scripts/validate_palette.js "#b61d25,#ef5854,#ff7e76" --ordinal --mode dark --surface "#1a1a19"
+```

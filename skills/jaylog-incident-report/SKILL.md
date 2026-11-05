@@ -18,7 +18,7 @@ Use a tool de perguntas de múltipla escolha (`AskUserQuestion`), numa única ch
 | **Escopo**: de quais serviços? | única | Todos os serviços (Recomendado) · Só os meus favoritos · Serviços de um owner (nome ou e-mail) |
 | **Categorias**: o que entra? | múltipla | Erros nos logs · Serviços parados · Agendamentos não cumpridos · Issues · Recursos das máquinas |
 | **Período**: qual janela? | única | Ontem (Recomendado) · Últimos 3 dias · Últimos 7 dias · (Outra: data ou intervalo) |
-| **Extras**: o que mais? | múltipla | Contatos de quem acionar · Mensagem/traceback completo dos erros principais · Só CRITICAL e EXCEPTION (ignorar ERROR) |
+| **Extras**: o que mais? | múltipla | Contatos de quem acionar · Mensagem/traceback completo dos erros principais · Só CRITICAL e EXCEPTION (ignorar ERROR) · Versão em HTML com gráficos |
 
 Regras para não virar burocracia:
 
@@ -133,6 +133,14 @@ O que não pôde ser verificado ou foi amostrado (resposta truncada, categoria s
 ```
 
 Ordene cada tabela por gravidade (CRITICAL/EXCEPTION antes de ERROR; mais ocorrências primeiro). Categoria selecionada sem ocorrências: uma linha "Nenhum incidente identificado." no lugar da tabela. O resumo só conta as categorias incluídas.
+
+### Versão em HTML (se escolhida)
+
+Depois de salvar o markdown, gere a versão visual com a skill `jaylog-html-report` (tipo
+"Incidentes"), reaproveitando os dados já coletados. Não consulte as tools de novo. Use o mesmo nome
+base do markdown, com `.spec.json` e `.html` (ex.: `reports/incidentes-2026-11-03.html`). Cada
+categoria escolhida vira uma seção, e as que não tiveram ocorrência viram uma seção `text` com
+"Nenhum incidente identificado.".
 
 ## 7. Responder no chat
 
