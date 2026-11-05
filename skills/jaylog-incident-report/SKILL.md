@@ -5,28 +5,32 @@ description: Gera um relatório de incidentes do ecossistema Jaylog em markdown 
 
 # Relatório de incidentes Jaylog
 
-Produz um relatório em markdown do que deu errado, usando as tools do MCP `jaylog` (somente leitura). O leitor típico abre o relatório de manhã para decidir o que atacar primeiro, então ele precisa dizer rápido **quem está quebrado, desde quando e quem acionar**, e deixar o detalhe para quem quiser se aprofundar. Como cada pessoa quer um recorte diferente (só os próprios serviços, só o que é crítico, sem contatos...), a skill começa com uma entrevista curta para montar o relatório sob medida.
+Produz um relatório em markdown do que deu errado, usando as tools do MCP `jaylog` (somente leitura). O leitor típico abre o relatório de manhã para decidir o que atacar primeiro, então ele precisa dizer rápido **quem está quebrado, desde quando e quem acionar**, e deixar o detalhe para quem quiser se aprofundar. Como cada pessoa quer um recorte diferente (só os próprios serviços, só os erros graves, outro período...), a skill começa com uma entrevista curta para montar o relatório sob medida.
 
 Se as tools do Jaylog (`list-logs`, `get-latest-logs` etc.) não estiverem disponíveis, avise que o MCP não está configurado/autenticado (`npx -y github:Gpocas/jaylog-mcp login`, com `JAYLOG_URL` definida) e pare. Não invente dados.
 
 ## 1. Entrevista de personalização
 
-Use a tool de perguntas de múltipla escolha (`AskUserQuestion`), numa única chamada com as perguntas abaixo. Marque a opção padrão como "(Recomendado)" e coloque-a primeiro: quem só quer o relatório de sempre escolhe a primeira opção de cada pergunta e segue em frente. A pessoa pode digitar outra resposta em "Outra".
+Use a tool de perguntas de múltipla escolha (`AskUserQuestion`), numa única chamada com exatamente as quatro perguntas abaixo, sem acrescentar, dividir ou reformular nenhuma (a tool aceita no máximo 4 perguntas com 4 opções cada). Marque a opção padrão como "(Recomendado)" e coloque-a primeiro: quem só quer o relatório de sempre escolhe a primeira opção de cada pergunta e segue em frente. A pessoa pode digitar outra resposta em "Outra".
 
 | Pergunta (cabeçalho) | Tipo | Opções |
 |---|---|---|
 | **Escopo**: de quais serviços? | única | Todos os serviços (Recomendado) · Só os meus favoritos · Serviços de um owner (nome ou e-mail) |
-| **Categorias**: o que entra? | múltipla | Erros nos logs · Serviços parados · Agendamentos não cumpridos · Issues · Recursos das máquinas |
 | **Período**: qual janela? | única | Ontem (Recomendado) · Últimos 3 dias · Últimos 7 dias · (Outra: data ou intervalo) |
-| **Extras**: o que mais? | múltipla | Contatos de quem acionar · Mensagem/traceback completo dos erros principais · Só CRITICAL e EXCEPTION (ignorar ERROR) · Versão em HTML com gráficos |
+| **Erros**: quais níveis de erro dos logs entram? | única | Todos: CRITICAL, EXCEPTION e ERROR (Recomendado) · Só os graves: CRITICAL e EXCEPTION · Nenhum: não incluir erros dos logs |
+| **Categorias**: o que mais entra? | múltipla | Serviços parados · Agendamentos não cumpridos · Issues · Recursos das máquinas |
+
+O nível de erro é decidido **só** na pergunta "Erros", que é de escolha única e também diz se os erros entram ou não. Por isso "Erros nos logs" não aparece em "Categorias", e não existe filtro de nível em nenhuma outra pergunta: assim as respostas não podem se contradizer.
 
 Regras para não virar burocracia:
 
-- **Pergunte só o que falta.** Se o pedido já responde algo ("relatório de ontem dos meus favoritos"), não pergunte de novo: omita essa pergunta e confirme a escolha na resposta final.
-- **Pule a entrevista** se a pessoa disser que quer o padrão, "rápido" ou "sem perguntas", ou se a skill estiver rodando sem ninguém para responder (rotina agendada, `/loop`). Nesse caso use o **padrão**: todos os serviços, as cinco categorias, ontem, com contatos e mensagens completas, todos os níveis de erro.
+- **Pergunte só o que falta.** Se o pedido já responde algo ("relatório de ontem dos meus favoritos", "só os críticos"), não pergunte de novo: omita essa pergunta e confirme a escolha na resposta final.
+- **Pule a entrevista** se a pessoa disser que quer o padrão, "rápido" ou "sem perguntas", ou se a skill estiver rodando sem ninguém para responder (rotina agendada, `/loop`). Nesse caso use o **padrão**: todos os serviços, ontem, todos os níveis de erro e as quatro categorias.
 - **Sem a tool de perguntas** (outro cliente, por exemplo), faça as mesmas perguntas numa única mensagem de texto, com opções numeradas, e espere a resposta.
-- Nada marcado em "Categorias" significa todas; nada marcado em "Extras" significa que os extras ficam de fora (foi uma escolha).
+- Nada marcado em "Categorias" significa todas. "Nenhum" em "Erros" com nada marcado em "Categorias" também significa todas as categorias, sem erros dos logs.
 - Se escolheu "Serviços de um owner", faça uma pergunta de texto curta pedindo o nome ou e-mail do dono.
+- **Contatos e mensagem completa** dos erros principais entram sempre, sem pergunta. Só tire se o pedido disser ("sem contatos", "só a mensagem principal").
+- **Versão em HTML**: não pergunte na entrevista. Gere se o pedido mencionar HTML, gráfico, painel ou dashboard; senão, ofereça na resposta final (etapa 7).
 
 Guarde as escolhas: elas guiam a coleta e vão para o cabeçalho do relatório, para o leitor saber o que está (e o que não está) ali.
 
@@ -54,11 +58,12 @@ Para filtrar, guarde os `id` dos serviços do escopo. Com poucos serviços (até
 Faça as chamadas independentes em paralelo. Cada categoria selecionada é um tipo de incidente, e uma sem ocorrências deve aparecer no relatório como "nenhum", e não ser omitida: quem lê precisa saber que foi verificada. Categorias que a pessoa não selecionou não entram (nem como "nenhum").
 
 **a) Erros nos logs**
-- `list-logs` com a janela e `log_level` = `ERROR`, `CRITICAL` e `EXCEPTION` (uma chamada por nível, o filtro é exato), mais `is_exception: true` se `EXCEPTION` não retornar nada, pois exceções às vezes vêm marcadas só por essa flag. Se a pessoa pediu "só CRITICAL e EXCEPTION", pule `ERROR`.
+- Entra conforme a pergunta "Erros": com "Nenhum", pule esta categoria inteira (e não a mostre no relatório).
+- `list-logs` com a janela e `log_level` = `CRITICAL`, `EXCEPTION` e `ERROR` (uma chamada por nível, o filtro é exato), mais `is_exception: true` se `EXCEPTION` não retornar nada, pois exceções às vezes vêm marcadas só por essa flag. Com "Só os graves", pule `ERROR`.
 - Agrupe por serviço e depois por mensagem parecida (ignore ids, timestamps e números variáveis ao comparar). Conte ocorrências, anote primeira e última ocorrência e os hosts afetados.
 - Se a resposta vier enorme ou truncada, use `get-error-history` para dimensionar e `list-logs` com filtro por serviço só nos mais ofensores. Registre no relatório que a amostra foi parcial.
 - Para os serviços mais ofensores, `get-error-summary` (com `days` igual à janela) mostra quais instâncias (host + usuário) concentram os erros. Isso diz se o problema é de uma máquina só ou do serviço todo. Com janela de vários dias, ela também dá o total acumulado do serviço.
-- Se escolheu o extra de mensagem completa, use `get-log` nos 1–3 erros mais relevantes de cada serviço; a lista pode estar resumida. Sem o extra, basta a mensagem principal.
+- Use `get-log` nos 1–3 erros mais relevantes de cada serviço para a mensagem completa; a lista pode estar resumida. Se o pedido disse "só a mensagem principal", pule.
 
 **b) Serviços parados**
 - `get-latest-logs` traz o último log por instância com dados de liveness (execução ativa, última atividade, múltiplas execuções vivas).
@@ -81,9 +86,9 @@ Faça as chamadas independentes em paralelo. Cada categoria selecionada é um ti
 
 Em todas as categorias, descarte o que não pertence aos serviços do escopo (etapa 2).
 
-## 5. Contatos (se escolhido)
+## 5. Contatos
 
-Para cada serviço que aparece em alguma categoria, busque quem acionar: `list-service-key-users` (filtro `service_id`) e `list-key-users` para nome e e-mail. O `owner` que vem em `list-services` é só um ID de usuário, sem nome; cite o nome do dono apenas quando você o tiver (por exemplo, vindo de `search-services-by-owner`). Um incidente sem contato é pouco acionável, e por isso o extra é recomendado, mas sem ele a coluna "Contato" sai do relatório.
+Para cada serviço que aparece em alguma categoria, busque quem acionar: `list-service-key-users` (filtro `service_id`) e `list-key-users` para nome e e-mail. O `owner` que vem em `list-services` é só um ID de usuário, sem nome; cite o nome do dono apenas quando você o tiver (por exemplo, vindo de `search-services-by-owner`). Um incidente sem contato é pouco acionável, por isso os contatos entram sempre; só tire a coluna "Contato" se o pedido disser "sem contatos".
 
 ## 6. Escrever o relatório
 
@@ -99,10 +104,10 @@ Se o arquivo já existir, sobrescreva: o relatório é regerável a partir dos d
 # Relatório de incidentes — DD/MM/AAAA
 
 Gerado em DD/MM/AAAA HH:MM · janela: <início> a <fim> (<fuso>)
-Escopo: <todos os serviços | favoritos de <usuário> | serviços de <owner>> · Categorias: <lista> · Níveis: <todos | CRITICAL e EXCEPTION>
+Escopo: <todos os serviços | favoritos de <usuário> | serviços de <owner>> · Erros: <CRITICAL, EXCEPTION e ERROR | só CRITICAL e EXCEPTION | não incluídos> · Categorias: <lista>
 
 ## Resumo
-- N serviços com erros (X erros/críticos/exceções no total)
+- N serviços com erros (X no total: C CRITICAL, E EXCEPTION, R ERROR)
 - N serviços parados
 - N agendamentos não cumpridos
 - N issues abertas/alteradas
@@ -114,7 +119,7 @@ Prioridades: 1–3 linhas dizendo o que atacar primeiro e por quê.
 | Serviço | Nível | Ocorrências | Primeira / última | Mensagem principal | Contato |
 |---|---|---|---|---|---|
 
-(Se escolheu mensagens completas: detalhe dos 1–3 erros mais relevantes, com mensagem completa ou traceback resumido, hosts afetados, id do log.)
+(Detalhe dos 1–3 erros mais relevantes, com mensagem completa ou traceback resumido, hosts afetados, id do log.)
 
 ## Serviços parados
 | Serviço | Host / usuário | Última atividade | Observação | Contato |
@@ -132,9 +137,9 @@ Prioridades: 1–3 linhas dizendo o que atacar primeiro e por quê.
 O que não pôde ser verificado ou foi amostrado (resposta truncada, categoria sem campo de data etc.).
 ```
 
-Ordene cada tabela por gravidade (CRITICAL/EXCEPTION antes de ERROR; mais ocorrências primeiro). Categoria selecionada sem ocorrências: uma linha "Nenhum incidente identificado." no lugar da tabela. O resumo só conta as categorias incluídas.
+Ordene cada tabela por gravidade, sempre nesta ordem: CRITICAL, depois EXCEPTION, depois ERROR (a mesma escala da skill `jaylog-html-report`); dentro do mesmo nível, mais ocorrências primeiro. Categoria selecionada sem ocorrências: uma linha "Nenhum incidente identificado." no lugar da tabela. O resumo só conta as categorias incluídas.
 
-### Versão em HTML (se escolhida)
+### Versão em HTML (se pedida)
 
 Depois de salvar o markdown, gere a versão visual com a skill `jaylog-html-report` (tipo
 "Incidentes"), reaproveitando os dados já coletados. Não consulte as tools de novo. Use o mesmo nome
@@ -144,7 +149,7 @@ categoria escolhida vira uma seção, e as que não tiveram ocorrência viram um
 
 ## 7. Responder no chat
 
-Termine com um resumo curto (3–6 linhas): as escolhas de personalização usadas, os números do topo, a prioridade principal e o caminho do arquivo gerado. Não cole o relatório inteiro no chat; ele está no arquivo.
+Termine com um resumo curto (3–6 linhas): as escolhas de personalização usadas, os números do topo, a prioridade principal e o caminho do arquivo gerado. Se não gerou a versão em HTML, ofereça numa linha ("Quer a versão interativa em HTML?"). Não cole o relatório inteiro no chat; ele está no arquivo.
 
 ## Cuidados
 

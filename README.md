@@ -300,8 +300,8 @@ instalação antiga via npmjs, que não é mais usada.
 
 - **`jaylog-incident-report`**: relatório em markdown de incidentes (erros nos logs, serviços
   parados, agendamentos não cumpridos, issues e máquinas com recursos no limite). Começa com uma entrevista de múltipla escolha
-  para personalizar escopo (todos, favoritos ou serviços de um owner), categorias, período
-  (padrão: dia anterior) e extras (contatos, mensagens completas, só críticos). Salva em
+  para personalizar escopo (todos, favoritos ou serviços de um owner), período (padrão: dia
+  anterior), níveis de erro (todos, só CRITICAL e EXCEPTION, ou nenhum) e categorias. Salva em
   `./reports/incidentes-AAAA-MM-DD.md`.
 - **`jaylog-fix-service-errors`**: levanta os erros recentes de um serviço (escolhido por nome,
   owner ou entre os favoritos), localiza o código responsável na pasta atual e **propõe**
