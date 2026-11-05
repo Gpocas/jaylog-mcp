@@ -28,7 +28,7 @@ separação para daltonismo nos dois temas.
 
 - Claro (superfície `#fcfcfb`): pior par vizinho com CVD ΔE 14,1 e visão normal ΔE 18,2. Os slots
   2, 3 e 6 ficam abaixo de 3:1 de contraste. A compensação exigida (rótulos ou tabela) é o botão
-  "Ver dados" de todo gráfico.
+  "Tabela" de todo gráfico.
 - Escuro (superfície `#1a1a19`): pior par vizinho com CVD ΔE 12,5 e visão normal ΔE 19,2. Todos ≥ 3:1.
 
 O vermelho fica de fora das séries de propósito, para não ser confundido com a escala de gravidade.
@@ -72,7 +72,7 @@ tons da marca; o meio é o cinza neutro da `dataviz`, que lê como "nada".
 Validação: entre os dois polos, CVD ΔE 25,8 no claro e 24,1 no escuro, e visão normal ΔE 29,2 e
 24,7. Os polos ficam fora da faixa de luminosidade das séries categóricas, o que é esperado: são
 pontas de rampa, não cores de série. O meio tem contraste baixo com a superfície de propósito
-(r ≈ 0 deve sumir); por isso cada célula traz o valor de r escrito e o "Ver dados" lista os pares.
+(r ≈ 0 deve sumir); por isso cada célula traz o valor de r escrito e o botão "Tabela" lista os pares.
 O vermelho fica de fora para não ser lido como gravidade.
 
 ## Interação

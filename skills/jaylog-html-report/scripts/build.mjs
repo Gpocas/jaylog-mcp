@@ -10,7 +10,8 @@ const here = dirname(fileURLToPath(import.meta.url))
 const assets = join(here, '..', 'assets')
 
 const MAX_SERIES = 6
-const SECTION_TYPES = ['kpis', 'chart', 'table', 'alerts', 'text']
+const SECTION_TYPES = ['kpis', 'chart', 'table', 'alerts', 'text', 'timeline']
+const TABS = ['overview', 'analysis']
 const CHART_KINDS = ['line', 'bar', 'heatmap', 'graph', 'sankey', 'correlation']
 const STATUSES = ['good', 'warning', 'serious', 'critical', 'info']
 const COLUMN_FORMATS = ['text', 'number', 'code', 'date', 'status', 'level', 'link', 'percent']
@@ -254,6 +255,8 @@ function validate(spec) {
     })
   }
   if (spec.details !== undefined && !isObj(spec.details)) fail('details', 'objeto { "campo": { "valor": { ... } } }')
+  if (spec.glossary !== undefined && (!isObj(spec.glossary) || Object.values(spec.glossary).some(v => !isStr(v))))
+    fail('glossary', 'objeto { "TERMO": "explicação em linguagem simples" }')
   if (spec.labels !== undefined && !isObj(spec.labels)) fail('labels', 'objeto { "campo": "Rótulo" }')
 
   if (!isArr(spec.sections) || spec.sections.length === 0) return fail('sections', 'informe ao menos uma seção')
@@ -268,6 +271,8 @@ function validate(spec) {
   spec.sections.forEach((section, i) => {
     const p = `sections[${i}]`
     if (!SECTION_TYPES.includes(section?.type)) return fail(`${p}.type`, `use um de: ${SECTION_TYPES.join(', ')}`)
+    if (section.tab !== undefined && !TABS.includes(section.tab)) fail(`${p}.tab`, `use um de: ${TABS.join(', ')}`)
+    section._tab = section.tab ?? (section.type === 'chart' ? 'analysis' : 'overview')
     switch (section.type) {
       case 'kpis':
         if (!isArr(section.items) || section.items.length === 0) return fail(`${p}.items`, 'lista de indicadores obrigatória')
@@ -285,6 +290,17 @@ function validate(spec) {
           section.chart.query._defaultBucket = spec.datasets?.[section.chart.query.dataset]?.time
         checkChart(`${p}.chart`, section.chart)
         if (section.chart?.query) delete section.chart.query._defaultBucket
+        {
+          const help = section.help ?? section.chart?.help
+          if (help !== undefined) {
+            if (!isObj(help)) fail(`${p}.help`, 'objeto { "what", "how", "read" } com textos em linguagem simples')
+            else {
+              for (const k of ['short', 'what', 'read']) if (help[k] !== undefined && !isStr(help[k])) fail(`${p}.help.${k}`, 'texto')
+              if (help.how !== undefined && !isStr(help.how) && !(isArr(help.how) && help.how.every(isStr))) fail(`${p}.help.how`, 'texto ou lista de textos')
+            }
+          }
+          if (!help?.read) warnings.push(`${p} ("${section.title}"): sem "help.read"; o "Como ler" vai usar a interpretação genérica. Diga o que este gráfico mostra neste relatório`)
+        }
         break
       case 'table':
         if (!isArr(section.columns) || section.columns.length === 0) return fail(`${p}.columns`, 'lista de colunas obrigatória')
@@ -320,14 +336,34 @@ function validate(spec) {
         section.items.forEach((item, j) => {
           if (!isStr(item.title)) fail(`${p}.items[${j}].title`, 'título obrigatório')
           if (item.severity !== undefined && !STATUSES.includes(item.severity)) fail(`${p}.items[${j}].severity`, `use um de: ${STATUSES.join(', ')}`)
+          if (item.action !== undefined && !isStr(item.action)) fail(`${p}.items[${j}].action`, 'texto curto: o que fazer')
           checkFocus(`${p}.items[${j}]`, item, ids)
         })
         break
       case 'text':
         if (!isArr(section.paragraphs) && !isArr(section.bullets)) fail(p, 'informe "paragraphs" e/ou "bullets" (listas de strings)')
+        if (section.variant !== undefined && section.variant !== 'summary') fail(`${p}.variant`, 'use "summary" (resumo em destaque) ou omita')
+        if (section.status !== undefined && !STATUSES.includes(section.status)) fail(`${p}.status`, `use um de: ${STATUSES.join(', ')}`)
         break
+      case 'timeline': {
+        const items = section.items ?? spec.events
+        if (!isArr(items) || !items.length) { fail(`${p}.items`, 'informe "items" ou defina "events" na raiz'); break }
+        items.forEach((it, j) => {
+          const ip = section.items ? `${p}.items[${j}]` : `events[${j}]`
+          if (!isoDay(it.at)) fail(`${ip}.at`, 'data ISO obrigatória')
+          if (!isStr(it.label)) fail(`${ip}.label`, 'rótulo obrigatório')
+          if (it.status !== undefined && !STATUSES.includes(it.status)) fail(`${ip}.status`, `use um de: ${STATUSES.join(', ')}`)
+          checkFocus(ip, it, ids)
+        })
+        break
+      }
     }
   })
+  const tabs = new Set(spec.sections.map(s => s._tab))
+  if (tabs.has('overview') && !spec.sections.some(s => s._tab === 'overview' && s.type === 'text' && s.variant === 'summary'))
+    warnings.push('a visão geral não tem resumo: comece com uma seção "text" com "variant": "summary", em linguagem simples')
+  if (spec.sections.some(s => s._tab === 'overview' && s.type === 'chart'))
+    warnings.push('há gráfico na visão geral; ela deve ficar só com resumo, KPIs, alertas, marcos, tabelas e texto')
   if (Object.keys(datasets).length && !spec.filters?.length)
     warnings.push('há "datasets" mas nenhum "filters": o leitor só consegue filtrar clicando nos gráficos')
 }
@@ -357,6 +393,7 @@ spec.generated_at ??= new Date().toISOString()
 
 const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 // `<` escaped so log text like "</script>" cannot close the data block.
+spec.sections.forEach(s => delete s._tab)
 const data = JSON.stringify(spec).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029')
 
 const html = readFileSync(join(assets, 'template.html'), 'utf8')

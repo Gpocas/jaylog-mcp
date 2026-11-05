@@ -308,7 +308,9 @@ instalação antiga via npmjs, que não é mais usada.
   correções (não edita arquivos).
 - **`jaylog-html-report`**: relatórios visuais e **interativos** em **HTML autocontido**: um único
   arquivo, com o ECharts e os dados embutidos, que abre offline e atrás de proxy. Cobre panorama de
-  um serviço, saúde de máquinas, incidentes e comparativo de serviços. O leitor filtra por período,
+  um serviço, saúde de máquinas, incidentes e comparativo de serviços. Abre numa **visão geral** para
+  qualquer pessoa (resumo em linguagem simples, KPIs, alertas com "o que fazer", marcos e tabelas) e
+  tem uma aba de **análise** com os gráficos, cada um com um "Como ler". Na análise, o leitor filtra por período,
   instância, nível ou erro, clica nos gráficos para cruzar os dados, vê correlações entre erros
   (matriz, grafo de relações, sankey, marcos de deploy) e abre um painel de detalhes de cada item.
   O modelo monta um JSON com os dados e o script `scripts/build.mjs` (Node, sem dependências) gera o

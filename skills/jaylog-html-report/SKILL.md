@@ -1,6 +1,6 @@
 ---
 name: jaylog-html-report
-description: Gera relatórios visuais e interativos do Jaylog em HTML autocontido (um único arquivo que abre offline no navegador, com ECharts embutido), como panorama de erros de um serviço, saúde de máquinas (CPU, memória, disco), versão visual do relatório de incidentes ou comparativo entre serviços. O leitor filtra por período, instância, nível ou erro, clica nos gráficos para cruzar os dados, vê correlações entre problemas (matriz, grafo de relações, sankey) e abre um painel de detalhes de cada item. O layout, os componentes e as cores (baseadas no OpenTelemetry, validadas para daltonismo e com tema claro e escuro) são sempre os mesmos. Use sempre que o usuário pedir relatório visual, dashboard, painel, gráficos, "em HTML", "com gráfico", "interativo", para visualizar, explorar ou plotar dados do Jaylog, ou uma versão visual de um relatório, mesmo sem citar "HTML" nem "Jaylog".
+description: Gera relatórios visuais e interativos do Jaylog em HTML autocontido (um único arquivo que abre offline no navegador, com ECharts embutido), como panorama de erros de um serviço, saúde de máquinas (CPU, memória, disco), versão visual do relatório de incidentes ou comparativo entre serviços. Abre numa visão geral que uma pessoa leiga entende (resumo em linguagem simples, KPIs, alertas com o que fazer, marcos e tabelas) e tem uma aba de análise com gráficos e filtros, cada gráfico com um "Como ler" que explica como usar e interpretar. Na análise, o leitor filtra por período, instância, nível ou erro, clica nos gráficos para cruzar os dados, vê correlações entre problemas (matriz, grafo de relações, sankey) e abre um painel de detalhes de cada item. O layout, os componentes e as cores (baseadas no OpenTelemetry, validadas para daltonismo e com tema claro e escuro) são sempre os mesmos. Use sempre que o usuário pedir relatório visual, dashboard, painel, gráficos, "em HTML", "com gráfico", "interativo", para visualizar, explorar ou plotar dados do Jaylog, ou uma versão visual de um relatório, mesmo sem citar "HTML" nem "Jaylog".
 ---
 
 # Relatórios visuais e interativos do Jaylog em HTML
@@ -9,8 +9,8 @@ Você monta um **spec em JSON** com os dados e as seções, e o script `scripts/
 a partir do template padrão. A divisão existe por três motivos:
 
 - **Padronização.** Se o modelo escrevesse HTML a cada vez, cada relatório sairia com um layout
-  diferente. Com o template, todos têm o mesmo cabeçalho, barra de filtros, cartões, cores, painel
-  de detalhes, botão de tema e tabela "Ver dados" em todo gráfico.
+  diferente. Com o template, todos têm as mesmas abas, barra de filtros, cartões, cores, painel
+  de detalhes, botão de tema, e "Como ler" e "Tabela" em todo gráfico.
 - **Interatividade sem servidor.** Os registros vão uma vez para dentro do arquivo (`datasets`) e o
   navegador recalcula KPIs, gráficos e tabelas a cada filtro ou clique. Um relatório que só mostra
   números prontos é um markdown com cores; o valor está em o leitor poder perguntar "e só na VM01?",
@@ -24,7 +24,21 @@ que o MCP do Jaylog já exige. Se as tools do Jaylog não estiverem disponíveis
 está configurado ou autenticado (`npx -y github:Gpocas/jaylog-mcp login`, com `JAYLOG_URL`
 definida) e pare. Não invente dados.
 
-## O que o leitor consegue fazer
+## Duas abas, dois leitores
+
+- **Visão geral** (abre primeiro): para quem quer saber em 1 minuto *o que aconteceu, se é grave e
+  o que fazer*, inclusive quem não é técnico. Só resumo em destaque, KPIs, alertas com "O que
+  fazer", marcos do período, tabelas curtas e o texto final. Sem gráficos nem filtros: os números
+  são do relatório inteiro e não mudam.
+- **Análise detalhada**: para quem vai investigar. Gráficos, filtros, cruzamentos e o painel de
+  detalhes. Cada gráfico tem um botão "? Como ler" com o que ele mostra, como usar e como
+  interpretar.
+
+O template separa sozinho: `chart` vai para a análise e o resto para a visão geral. Alertas, KPIs,
+marcos e linhas de tabela com `filter`/`target` são a ponte: um clique leva para a análise já
+filtrada no ponto certo.
+
+## O que o leitor consegue fazer na análise
 
 Vale saber, para montar o spec de forma que tudo isso funcione e para explicar ao usuário:
 
@@ -51,10 +65,10 @@ oferecendo os favoritos (`list-favorite-services`) como atalho.
 
 | Tipo | Pergunta que responde | Seções típicas |
 |---|---|---|
-| **Panorama de um serviço** | "Como está o serviço X?" | KPIs → alertas → erros por dia e nível → erros por instância → correlação entre erros → mapa de relações → heatmap dia × hora → recursos da instância mais afetada → principais erros → issues → leitura |
-| **Saúde de máquinas** | "Como estão as máquinas / a VM01?" | KPIs → alertas → tabela de instâncias (agora e pico) → CPU e memória ao longo do tempo das máquinas com alerta → grafo máquina ↔ serviços → leitura |
-| **Incidentes (visual)** | Versão visual do `jaylog-incident-report` | KPIs por categoria → erros por serviço → sankey serviço → máquina → nível → serviços parados → agendamentos não cumpridos → máquinas no limite → issues |
-| **Comparativo de serviços** | "Quais serviços mais erram?" | KPIs → erros por serviço (barra horizontal) → evolução diária com série por serviço → correlação entre serviços → tabela |
+| **Panorama de um serviço** | "Como está o serviço X?" | *Visão geral:* resumo → KPIs → alertas → marcos → principais erros → issues → o que fazer. *Análise:* erros por dia e nível → erros por instância → correlação entre erros → mapa de relações → heatmap dia × hora → recursos da instância mais afetada |
+| **Saúde de máquinas** | "Como estão as máquinas / a VM01?" | *Visão geral:* resumo → KPIs → alertas → tabela de instâncias (agora e pico) → o que fazer. *Análise:* CPU e memória ao longo do tempo das máquinas com alerta → grafo máquina ↔ serviços |
+| **Incidentes (visual)** | Versão visual do `jaylog-incident-report` | *Visão geral:* resumo → KPIs por categoria → alertas → tabelas de serviços parados, agendamentos não cumpridos, máquinas no limite e issues. *Análise:* erros por serviço → sankey serviço → máquina → nível |
+| **Comparativo de serviços** | "Quais serviços mais erram?" | *Visão geral:* resumo → KPIs → tabela de serviços. *Análise:* erros por serviço (barra horizontal) → evolução diária com série por serviço → correlação entre serviços |
 
 Esses são pontos de partida. Tire as seções que não têm dado e acrescente o que o pedido exigir.
 
@@ -104,8 +118,16 @@ se o `list-logs` não trouxer tudo, diga na `description` que os gráficos cobre
 O formato completo, com um exemplo por componente, está em `references/spec.md`. Um relatório
 completo de exemplo está em `assets/example-spec.json`. Regras que mantêm o relatório legível:
 
-- **Comece pelo que se responde em 5 segundos.** De 2 a 6 KPIs no topo, e depois os alertas, do
-  mais grave para o menos grave. Um número sozinho é KPI, não gráfico.
+- **A visão geral é para leigos.** Comece com um `text` de `variant: "summary"` (2 a 3 frases,
+  `status` da situação geral): o que aconteceu, desde quando, onde e se é grave, com os números em
+  **negrito**. Depois de 3 a 5 KPIs com `hint` em linguagem simples ("Os que costumam parar o
+  processo"), os alertas, do mais grave para o menos grave, **cada um com `action`** ("O que
+  fazer"). Em seguida, uma `timeline` com 3 a 6 marcos (o que mudou e quando), tabelas curtas
+  (`limit` 5 a 10) e, por último, um `text` "O que fazer agora".
+- **Escreva como para alguém de fora da TI.** Na visão geral, troque jargão por efeito: "falha
+  grave que costuma parar o robô" em vez de "CRITICAL", "notas sem CNPJ" em vez de "KeyError
+  'cnpj'" (a mensagem técnica fica na tabela). Títulos de seção em forma de pergunta respondida:
+  "O que precisa de atenção", "Erros que mais aconteceram". Um número sozinho é KPI, não gráfico.
 - **Ligue ao dataset sempre que der.** KPIs, gráficos e tabelas com `query` respondem aos filtros;
   os estáticos não. Declare `filters` para período e para as 2 a 4 dimensões que o leitor vai querer
   cortar (instância, nível, erro, serviço).
@@ -115,8 +137,13 @@ completo de exemplo está em `assets/example-spec.json`. Regras que mantêm o re
 - **Mostre correlações, mas como pista.** Use `correlation` quando houver 3 ou mais tipos de erro, e
   `graph` com `correlate` para juntar "onde acontece" com "o que anda junto". Marque deploys em
   `events`. Na leitura, chame correlação de indício, não de causa.
-- **Um gráfico, uma pergunta.** O título diz o que se vê ("Erros por dia e nível"). A descrição
-  diz de onde vem o dado e o que notar ("O volume sobe a partir de 21/10").
+- **Um gráfico, uma pergunta.** O título diz o que se vê ("Erros por dia e nível"). A descrição,
+  numa frase, diz o que é cada marca ("Cada barra é um dia").
+- **Todo gráfico com `help.read`.** É o "Como interpretar" do diálogo "Como ler": 2 a 4 frases
+  simples com o que notar *neste* gráfico, citando datas, nomes e números que aparecem na tela
+  ("Depois da linha tracejada (versão 2.3) as barras ficam bem mais altas"). O "o que mostra" e o
+  "como usar" o template gera sozinho; só sobrescreva se houver algo específico. Confira com um
+  script que os números citados batem com os dados.
 - **Escolha a forma pela pergunta:**
   - evolução contínua (CPU, memória) → `line`;
   - contagem por dia → `bar` com `dates`;
@@ -141,8 +168,8 @@ completo de exemplo está em `assets/example-spec.json`. Regras que mantêm o re
 - **Dados sensíveis.** Mensagens de log podem ter CPF, CNPJ, e-mails, tokens e senhas. Troque por
   valores fictícios no mesmo formato antes de pôr no spec (inclusive em `details.samples`), porque o
   HTML costuma ser repassado e o dataset inteiro vai dentro dele.
-- **Termine com leitura.** Uma seção `text` com 1 ou 2 parágrafos de interpretação e os próximos
-  passos em `bullets`. Separe fato de hipótese.
+- **Termine com "O que fazer agora".** Uma seção `text` com 1 ou 2 parágrafos (`**Fato:**`,
+  `**Hipótese:**`) e os próximos passos em `bullets`. Separe fato de hipótese.
 
 ## 4. Gerar
 
@@ -162,13 +189,17 @@ indicam que vale agregar mais.
 
 ## 5. Conferir e entregar
 
-- Se você tiver como ver a página (ferramenta de screenshot ou navegador), abra e olhe:
-  sobreposição de rótulos, gráfico vazio, número estranho, grafo embolado (diminua `limit`). Clique
-  num filtro e confira se KPIs e gráficos mudam juntos. O build valida a estrutura, não o conteúdo.
+- Se você tiver como ver a página (ferramenta de screenshot ou navegador), abra e olhe as duas
+  abas: sobreposição de rótulos, gráfico vazio, número estranho, grafo embolado (diminua `limit`).
+  Clique num alerta e confira se ele leva ao gráfico certo, já filtrado. O build valida a
+  estrutura, não o conteúdo.
+- Releia a visão geral como se você não soubesse nada do sistema: dá para entender o que
+  aconteceu e o que fazer sem abrir a análise?
 - Informe o caminho do arquivo e ofereça abrir. No Linux use `xdg-open <arquivo>`, no macOS
   `open <arquivo>`, no Windows `start "" <arquivo>` e no WSL `explorer.exe "$(wslpath -w <arquivo>)"`.
 - No chat, resuma em 3 a 5 linhas o que o relatório mostra (o principal problema e o próximo
-  passo) e diga em uma linha o que dá para explorar ("clique numa instância ou arraste um período").
+  passo) e diga em uma linha como usar ("a visão geral resume; na aba Análise detalhada cada
+  gráfico tem um botão Como ler").
   Não repita o relatório inteiro.
 
 ## Cuidados

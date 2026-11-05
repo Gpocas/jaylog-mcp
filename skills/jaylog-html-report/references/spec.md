@@ -4,8 +4,24 @@ O `scripts/build.mjs` recebe um JSON neste formato e gera o HTML. Ele valida tud
 todos os problemas de uma vez, com o caminho do campo (ex.: `sections[2].chart.query.x`).
 Exemplo completo, com todos os componentes interativos: `assets/example-spec.json`.
 
-Todo texto é exibido como **texto puro**: HTML e Markdown aparecem literalmente. Isso é proposital,
-porque mensagens de log entram no relatório e não podem virar código na página.
+Todo texto é exibido como **texto puro**: HTML aparece literalmente. Isso é proposital, porque
+mensagens de log entram no relatório e não podem virar código na página. A única exceção são as
+seções `text`, que aceitam um Markdown mínimo (abaixo), montado sem HTML.
+
+## As duas abas
+
+O relatório tem duas abas. Cada seção vai para uma delas automaticamente, ou pelo campo `tab`.
+
+| Aba | `tab` | Conteúdo | Para quem |
+|---|---|---|---|
+| **Visão geral** (abre primeiro) | `overview` (padrão de tudo que não é gráfico) | resumo, KPIs, alertas, marcos (`timeline`), tabelas e texto. **Sem gráficos e sem filtros**: os números são sempre do relatório inteiro | qualquer pessoa, inclusive leiga |
+| **Análise detalhada** | `analysis` (padrão de `chart`) | gráficos, barra de filtros, painel de detalhes | quem vai investigar |
+
+- Na visão geral, alertas, KPIs, marcos e linhas de tabela com `filter`/`target` levam para a
+  análise já filtrada. Uma tabela com `filter_field` (ou `query`) faz o mesmo ao clicar numa linha.
+- Com seções só de um tipo, as abas somem e a página fica com uma só.
+- Evite gráfico na visão geral (o build avisa). Uma tabela ou KPI pode ir para a análise com
+  `"tab": "analysis"`; lá ela responde aos filtros.
 
 ## Dois jeitos de alimentar uma seção
 
@@ -30,10 +46,12 @@ porque mensagens de log entram no relatório e não podem virar código na pági
 | `labels` | não | Nome legível de cada campo: `{ "instance": "Instância", "error": "Erro" }` |
 | `events` | não | Marcos verticais nos gráficos de tempo (deploy, incidente) |
 | `details` | não | Texto, fatos, exemplos e links extras do painel de detalhes |
+| `glossary` | não | Termos explicados em linguagem simples: `{ "CRITICAL": "Falha grave…" }`. Já vem com CRITICAL, EXCEPTION e ERROR; use para trocar ou acrescentar termos |
 | `sections` | sim | Lista de seções, renderizadas na ordem |
 
-Toda seção aceita `title` (h2), `description` (uma ou duas frases sob o título) e `id` (minúsculas e
-hífen), usado por alertas e KPIs para levar o leitor até ela. Em gráficos o `title` é obrigatório.
+Toda seção aceita `title` (h2), `description` (uma ou duas frases sob o título), `id` (minúsculas e
+hífen), usado por alertas, KPIs e marcos para levar o leitor até ela, e `tab`. Em gráficos o
+`title` é obrigatório.
 
 ## `datasets`: os registros
 
@@ -156,9 +174,31 @@ Campos comuns a toda `query`:
 ]}
 ```
 
-`severity` usa os valores de `status`. Ordene do mais grave para o menos grave. `filter` e `target`
-funcionam como nos KPIs: dê a todo alerta que tenha dado por trás um `filter`, para o leitor ir do
-alerta à evidência com um clique.
+`severity` usa os valores de `status`. Ordene do mais grave para o menos grave.
+
+- `action`: o que fazer, numa frase, em linguagem simples ("Reiniciar o robô hoje"). Aparece como
+  "O que fazer: …". Dê a todo alerta que não seja só informativo.
+- `filter` e `target` funcionam como nos KPIs: o alerta ganha "Ver nos gráficos →" e leva para a
+  análise já filtrada.
+
+```json
+{ "severity": "warning", "title": "Memória do robô crescendo sem parar", "detail": "270 MB → 660 MB em 2 h.",
+  "action": "Reiniciar o robô hoje e acompanhar a issue #119.", "filter": { "error": "MemoryError ao gerar o PDF do lote" }, "target": "correlacao" }
+```
+
+## `timeline`: marcos do período
+
+```json
+{ "type": "timeline", "title": "Marcos do período", "items": [
+  { "at": "2026-10-21T15:00", "label": "Entrou a versão 2.3 do robô", "detail": "A partir daqui o erro de CNPJ disparou.",
+    "filter": { "error": "KeyError: 'cnpj' em importar_notas()" }, "target": "erros-por-dia" },
+  { "at": "2026-10-30", "label": "Dois dias de instabilidade do SAP", "status": "warning", "filter": { "date": ["2026-10-30", "2026-10-31"] } }
+]}
+```
+
+Linha do tempo vertical, em ordem de data. Sem `items`, usa os `events` da raiz. `status` pinta o
+marco e mostra o rótulo (exceto `info`). `filter`/`target` deixam o marco clicável; um `filter` no
+campo de período aceita `[início, fim]`. Use 3 a 6 marcos: o que mudou e quando.
 
 ## `chart`: gráfico
 
@@ -187,10 +227,34 @@ Campos comuns do objeto `chart`:
 | `y_min`, `y_max` | Limites do eixo de valores (ex.: `0` e `100` para percentuais) |
 | `filter_field` | Só em gráfico estático: clicar numa categoria filtra o relatório por este campo |
 
-Todo gráfico ganha automaticamente: tooltip, botão "Ver dados" (tabela ordenável e pesquisável com
-os números do recorte atual), botão "PNG", animação de entrada quando aparece na tela e de
+Todo gráfico ganha automaticamente: botão **"Como ler"** (abaixo), tooltip, botão "Tabela" (tabela
+ordenável e pesquisável com os números do recorte atual), botão "PNG", animação de entrada quando aparece na tela e de
 transição quando os filtros mudam, barra de zoom quando o eixo é longo, e tooltip sincronizado
 entre gráficos com o mesmo eixo de tempo (passar o mouse num dia mostra o mesmo dia nos outros).
+
+### `help`: o "Como ler" de cada gráfico
+
+Todo gráfico tem um botão "? Como ler". Passar o mouse mostra uma frase do que ele mostra; clicar
+abre um diálogo com **O que mostra**, **Como usar** (passos de interação e filtros, conforme o tipo
+de gráfico), **Como interpretar** e, quando há níveis de log, **O que significam os níveis**.
+
+O template gera textos genéricos por tipo. Sobrescreva o que quiser, no nível da seção:
+
+```json
+{ "type": "chart", "title": "Erros por dia e nível",
+  "help": { "read": "Até 20/10 o robô tinha poucos erros por dia. Depois da linha tracejada (versão 2.3) as barras ficam bem mais altas e escuras: são os erros de notas sem CNPJ." },
+  "chart": { … } }
+```
+
+| Campo | Descrição |
+|---|---|
+| `read` | **Escreva sempre.** O que o leitor deve notar *neste* gráfico, com datas, nomes e números reais. O build avisa quando falta |
+| `what` | O que o gráfico mostra (padrão: frase gerada pelo tipo e pelos campos) |
+| `how` | Texto ou lista de passos (padrão: gerado pelo tipo; só troque se houver algo específico) |
+| `short` | Frase do tooltip (padrão: `what`) |
+
+Escreva para quem nunca viu o gráfico: frases curtas, sem jargão ("r", "Pearson", "bucket"), com
+os nomes que aparecem na tela.
 
 ### `line` e `bar`
 
@@ -343,18 +407,32 @@ Com `query`:
 
 - `measures`: `"agg:campo"` (`sum`, `max`, `min`, `avg`, `distinct`) ou `"count"`. Sem `measures`,
   há uma coluna `count`. As `columns` só podem usar campos de `group_by` e chaves de `measures`.
-- `sort` (chave), `sort_dir` (`asc`; padrão decrescente), `limit`, `page_size` (padrão 25).
-- Clicar numa linha filtra por `filter_field` (padrão com `query`: o primeiro `group_by`). A linha
-  selecionada fica destacada e as outras esmaecem. Use `filter_field` numa tabela estática para
+- `sort` (chave), `sort_dir` (`asc`; padrão decrescente), `limit`, `page_size` (padrão 10 na visão
+  geral e 25 na análise). Na visão geral, prefira `limit` de 5 a 10 linhas.
+- Clicar numa linha filtra por `filter_field` (padrão com `query`: o primeiro `group_by`). Na visão
+  geral, o clique leva para a análise já filtrada; na análise, a linha selecionada fica destacada e
+  as outras esmaecem. Na visão geral a tabela mostra sempre o relatório inteiro. Use `filter_field` numa tabela estática para
   ligá-la ao dataset (ex.: issue → erro).
 - `format`: `text` (padrão), `number`, `code` (monoespaçado), `date` (ISO vira `03/11 22:41`),
-  `status` (bolinha + rótulo), `level` (bolinha na cor de gravidade + nome do nível), `percent`
+  `status` (bolinha + rótulo), `level` (bolinha na cor de gravidade + nome do nível, com a
+  explicação do `glossary` ao passar o mouse), `percent`
   (0,25 vira 25%) ou `link` (URL `http(s)`, com `link_text`).
 - `numeric: true` alinha à direita. `unit` acrescenta a unidade.
 - Busca acima de 8 linhas, paginação, e ordenação ao clicar no cabeçalho.
 
-## `text`: leitura e próximos passos
+## `text`: resumo, leitura e próximos passos
 
 ```json
-{ "type": "text", "title": "Leitura", "paragraphs": ["…"], "bullets": ["…", "…"] }
+{ "type": "text", "variant": "summary", "status": "critical", "title": "Em resumo", "paragraphs": [
+  "O Robô Faturamento teve **438 erros** nos últimos 45 dias, e eles **aumentaram desde 21/10**."
+] }
 ```
+
+```json
+{ "type": "text", "title": "O que fazer agora", "paragraphs": ["**Fato:** …", "**Hipótese:** …"], "bullets": ["…", "…"] }
+```
+
+- `variant: "summary"`: cartão em destaque, com letra maior e faixa lateral na cor de `status`. É a
+  primeira seção da visão geral (o build avisa quando falta).
+- Markdown aceito em `paragraphs` e `bullets`: `**negrito**`, `*itálico*`, `` `código` `` e
+  `[texto](https://…)`. Nada mais: listas vêm de `bullets`, e títulos, do `title` da seção.

@@ -4,7 +4,7 @@
  "period": "20/09/2026 a 03/11/2026",
  "source": "Jaylog MCP — get-error-summary, get-error-history, get-resource-usage, get-host-metrics, list-logs, list-issues",
  "labels": {
-  "instance": "Instância",
+  "instance": "Máquina",
   "level": "Nível",
   "error": "Erro",
   "date": "Dia",
@@ -3527,7 +3527,7 @@
   },
   {
    "field": "instance",
-   "label": "Instância"
+   "label": "Máquina"
   },
   {
    "field": "level",
@@ -3604,47 +3604,62 @@
  },
  "sections": [
   {
+   "type": "text",
+   "variant": "summary",
+   "status": "critical",
+   "title": "Em resumo",
+   "paragraphs": [
+    "O Robô Faturamento teve **438 erros** nos últimos 45 dias, e eles **aumentaram desde 21/10**, dia em que entrou a versão 2.3.",
+    "Quase todo o aumento vem de **um único erro**: notas fiscais que chegam sem o CNPJ (133 vezes), praticamente só na máquina **VM01**. A VM01 também está com a **CPU em 95%** agora e o **disco quase cheio (91%)**.",
+    "Os erros de comunicação com o SAP são outro assunto: acontecem em rajadas, nos mesmos dias, e apontam para o SAP, não para o robô."
+   ]
+  },
+  {
    "type": "kpis",
+   "title": "Números principais",
    "items": [
     {
      "label": "Erros no período",
      "query": {
       "dataset": "erros"
      },
-     "hint": "ERROR + EXCEPTION + CRITICAL",
+     "hint": "Soma de todos os níveis em 45 dias",
      "status": "critical",
      "status_label": "Subindo desde 21/10",
      "target": "erros-por-dia"
     },
     {
-     "label": "Críticos",
+     "label": "Erros graves (CRITICAL)",
      "query": {
       "dataset": "erros",
       "where": {
        "level": "CRITICAL"
       }
      },
+     "hint": "Os que costumam parar o processo",
      "filter": {
       "level": "CRITICAL"
      },
      "target": "erros-por-dia"
     },
     {
-     "label": "Instâncias com erro",
+     "label": "Máquinas com erro",
      "query": {
       "dataset": "erros",
       "agg": "distinct",
       "value": "instance"
      },
-     "unit": "de 3"
+     "unit": "de 3",
+     "hint": "A VM03 não teve erro"
     },
     {
-     "label": "Tipos de erro",
+     "label": "Tipos de erro diferentes",
      "query": {
       "dataset": "erros",
       "agg": "distinct",
       "value": "error"
      },
+     "hint": "Mensagens agrupadas",
      "target": "principais-erros"
     },
     {
@@ -3652,37 +3667,41 @@
      "value": 91,
      "unit": "%",
      "status": "warning",
-     "status_label": "Acima de 90%",
+     "status_label": "Quase cheio",
+     "hint": "Acima de 90% pode travar o robô",
      "target": "recursos"
     }
    ]
   },
   {
    "type": "alerts",
-   "title": "Alertas",
+   "title": "O que precisa de atenção",
    "items": [
     {
      "severity": "critical",
-     "title": "CPU da VM01 em 95% agora",
-     "detail": "Média de 64% nas últimas 2 h; a VM01 roda também o Bot Cadastro.",
-     "filter": {
-      "instance": "VM01 · bot"
-     },
-     "target": "recursos"
-    },
-    {
-     "severity": "critical",
-     "title": "KeyError 'cnpj' 6× mais frequente desde o deploy v2.3",
-     "detail": "De ~1 por dia para ~7 por dia a partir de 21/10, quase tudo na VM01.",
+     "title": "Notas sem CNPJ: erro 5× mais frequente desde a versão 2.3",
+     "detail": "Passou de ~1 por dia para ~7 por dia a partir de 21/10, quase tudo na VM01.",
+     "action": "Acionar o time do robô para tratar notas de serviço sem CNPJ (issue #128).",
      "filter": {
       "error": "KeyError: 'cnpj' em importar_notas()"
      },
      "target": "erros-por-dia"
     },
     {
+     "severity": "critical",
+     "title": "CPU da VM01 em 95% agora",
+     "detail": "Média de 64% nas últimas 2 h; a VM01 roda também o Bot Cadastro.",
+     "action": "Verificar se o Bot Cadastro pode rodar em outro horário.",
+     "filter": {
+      "instance": "VM01 · bot"
+     },
+     "target": "recursos"
+    },
+    {
      "severity": "warning",
-     "title": "Memória do processo cresceu 144% em 2 h",
-     "detail": "Padrão de vazamento: 270 MB → 660 MB sem queda. O MemoryError do PDF acompanha.",
+     "title": "Memória do robô crescendo sem parar",
+     "detail": "Foi de 270 MB a 660 MB em 2 h, sem cair. O erro de memória ao gerar PDF acompanha.",
+     "action": "Reiniciar o robô hoje e acompanhar a issue #119.",
      "filter": {
       "error": "MemoryError ao gerar o PDF do lote"
      },
@@ -3690,16 +3709,170 @@
     },
     {
      "severity": "info",
-     "title": "VM02 sem amostras há 1 h",
-     "detail": "Última atividade às 22:44; confira se a execução terminou normalmente."
+     "title": "VM02 sem enviar dados há 1 h",
+     "detail": "Última atividade às 22:44.",
+     "action": "Conferir se a execução terminou normalmente."
     }
+   ]
+  },
+  {
+   "type": "timeline",
+   "title": "Marcos do período",
+   "description": "Clique num marco para ver o que aconteceu nos gráficos.",
+   "items": [
+    {
+     "at": "2026-10-21T15:00",
+     "label": "Entrou a versão 2.3 do robô",
+     "detail": "A partir daqui o erro de notas sem CNPJ disparou.",
+     "filter": {
+      "error": "KeyError: 'cnpj' em importar_notas()"
+     },
+     "target": "erros-por-dia"
+    },
+    {
+     "at": "2026-10-28",
+     "label": "Erro de memória ao gerar PDF começa a crescer",
+     "status": "warning",
+     "filter": {
+      "error": "MemoryError ao gerar o PDF do lote"
+     },
+     "target": "erros-por-dia"
+    },
+    {
+     "at": "2026-10-30",
+     "label": "Dois dias de instabilidade do SAP",
+     "detail": "30 e 31/10 tiveram rajadas de timeout e conexão recusada.",
+     "status": "warning",
+     "filter": {
+      "date": [
+       "2026-10-30",
+       "2026-10-31"
+      ]
+     },
+     "target": "erros-por-dia"
+    },
+    {
+     "at": "2026-11-03T22:44",
+     "label": "VM02 para de enviar dados",
+     "status": "info"
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "id": "principais-erros",
+   "title": "Erros que mais aconteceram",
+   "description": "Mensagens parecidas foram agrupadas. Passe o mouse no nível para ver o que ele significa.",
+   "query": {
+    "dataset": "erros",
+    "group_by": [
+     "error",
+     "level"
+    ],
+    "measures": {
+     "count": "sum:count",
+     "instances": "distinct:instance",
+     "last": "max:date"
+    },
+    "sort": "count",
+    "limit": 8
+   },
+   "columns": [
+    {
+     "key": "level",
+     "label": "Nível",
+     "format": "level"
+    },
+    {
+     "key": "error",
+     "label": "Mensagem",
+     "format": "code"
+    },
+    {
+     "key": "count",
+     "label": "Vezes",
+     "numeric": true
+    },
+    {
+     "key": "instances",
+     "label": "Máquinas",
+     "numeric": true
+    },
+    {
+     "key": "last",
+     "label": "Última vez",
+     "format": "date"
+    }
+   ]
+  },
+  {
+   "type": "table",
+   "title": "Chamados abertos",
+   "description": "Issues já registradas para estes erros.",
+   "filter_field": "error",
+   "columns": [
+    {
+     "key": "id",
+     "label": "Issue",
+     "format": "code"
+    },
+    {
+     "key": "title",
+     "label": "Título"
+    },
+    {
+     "key": "error",
+     "label": "Erro relacionado",
+     "format": "code"
+    },
+    {
+     "key": "status",
+     "label": "Situação",
+     "format": "status"
+    }
+   ],
+   "rows": [
+    {
+     "id": "#128",
+     "title": "Notas de serviço sem CNPJ após v2.3",
+     "error": "KeyError: 'cnpj' em importar_notas()",
+     "status": "critical"
+    },
+    {
+     "id": "#131",
+     "title": "Lentidão do SAP no fechamento",
+     "error": "TimeoutError: SAP não respondeu em 30s",
+     "status": "warning"
+    },
+    {
+     "id": "#119",
+     "title": "Vazamento de memória na geração de PDF",
+     "error": "MemoryError ao gerar o PDF do lote",
+     "status": "warning"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "title": "O que fazer agora",
+   "paragraphs": [
+    "**Fato:** o aumento de erros começou com a versão 2.3 e vem quase todo do erro de notas sem CNPJ, na VM01.",
+    "**Hipótese:** o erro de memória ao gerar PDF está ligado ao consumo de memória crescente da VM01. Ainda precisa ser confirmado."
+   ],
+   "bullets": [
+    "Corrigir o tratamento de notas sem CNPJ (issue #128).",
+    "Abrir chamado com o time do SAP, com os dias de instabilidade (30 e 31/10).",
+    "Liberar espaço em disco na VM01 (91%)."
    ]
   },
   {
    "type": "chart",
    "id": "erros-por-dia",
    "title": "Erros por dia e nível",
-   "description": "Agregado do list-logs. A linha tracejada marca o deploy v2.3; o volume sobe a partir dele.",
+   "description": "Cada barra é um dia. A linha tracejada marca a entrada da versão 2.3.",
+   "help": {
+    "read": "Até 20/10 o robô tinha poucos erros por dia, quase todos ERROR (tom claro). Depois da linha tracejada (versão 2.3), as barras ficam bem mais altas e escuras: são os erros EXCEPTION e CRITICAL de notas sem CNPJ. Os picos isolados (29/09, 06/10, 07/10 e 30/10) são as rajadas do SAP."
+   },
    "chart": {
     "kind": "bar",
     "stacked": true,
@@ -3714,8 +3887,11 @@
   },
   {
    "type": "chart",
-   "title": "Erros por instância",
-   "description": "Soma de todos os níveis por host · usuário. A VM03 não teve erro no período.",
+   "title": "Erros por máquina",
+   "description": "Soma de todos os níveis por máquina (host · usuário).",
+   "help": {
+    "read": "A VM01 tem um pouco mais de erros que a VM02 (237 contra 201), mas o erro que cresceu, o de notas sem CNPJ, está quase todo nela (121 de 133). Clique na VM01 para ver isso nos outros gráficos. A VM03 não aparece porque não teve erro."
+   },
    "chart": {
     "kind": "bar",
     "horizontal": true,
@@ -3730,8 +3906,11 @@
   {
    "type": "chart",
    "id": "correlacao",
-   "title": "Quais erros variam juntos",
-   "description": "Correlação entre as contagens diárias de cada erro (Pearson). Azul: sobem e descem juntos; âmbar: um sobe quando o outro desce.",
+   "title": "Quais erros acontecem juntos",
+   "description": "Compara, dia a dia, se dois erros sobem e descem ao mesmo tempo.",
+   "help": {
+    "read": "O quadrado mais azul liga o timeout do SAP à conexão recusada pelo SAP: os dois aparecem nos mesmos dias, o que reforça que o problema é do SAP. O erro de CNPJ e o de memória também andam juntos, porque os dois cresceram depois da versão 2.3."
+   },
    "chart": {
     "kind": "correlation",
     "query": {
@@ -3744,8 +3923,11 @@
   },
   {
    "type": "chart",
-   "title": "Mapa de relações: instâncias e erros",
-   "description": "Linhas cheias: onde cada erro acontece (espessura = volume). Tracejadas: erros que variam juntos no tempo (r ≥ 0,5).",
+   "title": "Mapa de relações: máquinas e erros",
+   "description": "Onde cada erro acontece e quais erros andam juntos.",
+   "help": {
+    "read": "O erro de CNPJ e o de memória se ligam quase só à VM01, por isso o problema é daquela máquina. O PermissionError se liga só à VM02. Os erros do SAP se ligam às duas máquinas, um sinal de que a causa é externa."
+   },
    "chart": {
     "kind": "graph",
     "query": {
@@ -3761,8 +3943,11 @@
   },
   {
    "type": "chart",
-   "title": "Caminho dos erros: instância → nível → mensagem",
+   "title": "Caminho dos erros: máquina → nível → mensagem",
    "description": "A largura de cada faixa é o número de erros.",
+   "help": {
+    "read": "A faixa mais larga sai da VM01, passa por EXCEPTION e chega no erro de CNPJ: é o caminho principal do problema."
+   },
    "chart": {
     "kind": "sankey",
     "query": {
@@ -3779,7 +3964,10 @@
   {
    "type": "chart",
    "title": "Erros por dia da semana e hora",
-   "description": "Horário de Brasília (UTC−3). Concentração no horário comercial; o PermissionError aparece às segundas de manhã.",
+   "description": "Horário de Brasília (UTC−3).",
+   "help": {
+    "read": "Os erros se concentram em dias úteis, das 8h às 18h, quando o robô mais trabalha. O quadrado escuro de segunda às 7h–9h é o PermissionError da pasta de rede, que acontece toda segunda de manhã."
+   },
    "chart": {
     "kind": "heatmap",
     "query": {
@@ -3826,7 +4014,7 @@
   },
   {
    "type": "chart",
-   "title": "Uso de recursos — VM01 (últimas 48 h)",
+   "title": "Uso de recursos da VM01 (últimas 48 h)",
    "description": "Médias por hora (get-host-metrics). Linhas tracejadas: limites de atenção e crítico.",
    "chart": {
     "kind": "line",
@@ -4058,113 +4246,10 @@
      }
     ]
    },
-   "id": "recursos"
-  },
-  {
-   "type": "table",
-   "id": "principais-erros",
-   "title": "Principais erros",
-   "description": "Agrupados por mensagem (ids e números removidos).",
-   "query": {
-    "dataset": "erros",
-    "group_by": [
-     "error",
-     "level"
-    ],
-    "measures": {
-     "count": "sum:count",
-     "instances": "distinct:instance",
-     "last": "max:date"
-    },
-    "sort": "count"
-   },
-   "columns": [
-    {
-     "key": "level",
-     "label": "Nível",
-     "format": "level"
-    },
-    {
-     "key": "error",
-     "label": "Mensagem",
-     "format": "code"
-    },
-    {
-     "key": "count",
-     "label": "Ocorrências",
-     "numeric": true
-    },
-    {
-     "key": "instances",
-     "label": "Instâncias",
-     "numeric": true
-    },
-    {
-     "key": "last",
-     "label": "Último dia",
-     "format": "date"
-    }
-   ]
-  },
-  {
-   "type": "table",
-   "title": "Issues abertas",
-   "description": "list-issues. Clique numa issue para ver o erro ligado a ela.",
-   "filter_field": "error",
-   "columns": [
-    {
-     "key": "id",
-     "label": "Issue",
-     "format": "code"
-    },
-    {
-     "key": "title",
-     "label": "Título"
-    },
-    {
-     "key": "error",
-     "label": "Erro relacionado",
-     "format": "code"
-    },
-    {
-     "key": "status",
-     "label": "Status",
-     "format": "status"
-    }
-   ],
-   "rows": [
-    {
-     "id": "#128",
-     "title": "Notas de serviço sem CNPJ após v2.3",
-     "error": "KeyError: 'cnpj' em importar_notas()",
-     "status": "critical"
-    },
-    {
-     "id": "#131",
-     "title": "Lentidão do SAP no fechamento",
-     "error": "TimeoutError: SAP não respondeu em 30s",
-     "status": "warning"
-    },
-    {
-     "id": "#119",
-     "title": "Vazamento de memória na geração de PDF",
-     "error": "MemoryError ao gerar o PDF do lote",
-     "status": "warning"
-    }
-   ]
-  },
-  {
-   "type": "text",
-   "title": "Leitura",
-   "paragraphs": [
-    "Fato: o KeyError 'cnpj' explica a maior parte da alta desde 21/10, dia do deploy v2.3, e acontece quase só na VM01. TimeoutError e ConnectionResetError sobem juntos nos mesmos dias (r alto), o que aponta para o SAP e não para o robô.",
-    "Hipótese: o MemoryError do PDF, que cresce a partir de 28/10, está ligado ao vazamento de memória visto nas últimas 48 h da VM01."
-   ],
-   "bullets": [
-    "Corrigir o tratamento de notas sem 'cnpj' (issue #128).",
-    "Abrir chamado com o time do SAP com os dias de rajada de timeout.",
-    "Liberar espaço em disco na VM01 (91%)."
-   ]
+   "id": "recursos",
+   "help": {
+    "read": "O disco (linha rosa) está colado no limite crítico de 90% o tempo todo. A memória sobe sem parar e chega perto de 80%. A CPU varia bastante, com picos acima de 60%."
+   }
   }
  ]
 }
