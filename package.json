@@ -14,7 +14,7 @@
     "dev": "bun --watch src/index.ts",
     "login": "bun src/index.ts login",
     "logout": "bun src/index.ts logout",
-    "build": "tsc && chmod +x dist/*.js",
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "prepare": "npm run build"
   },
